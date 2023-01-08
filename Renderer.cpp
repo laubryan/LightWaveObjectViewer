@@ -38,7 +38,8 @@ bool Renderer::LoadObject() {
 void Renderer::Present() {
 
 	// Flip the back buffer
-	_swapChain->Present(0, 0);
+	HRESULT hr = _swapChain->Present(0, 0);
+	assert(!FAILED(hr));
 }
 
 /// <summary>
@@ -49,16 +50,18 @@ void Renderer::Render() {
 	// Update constant buffer
 	_deviceContext->UpdateSubresource(_constantBuffer, 0, nullptr, &_constantBufferData, 0, 0);
 
+	// Bind render target (Output-Merger stage)
+	_deviceContext->OMSetRenderTargets(1, &_renderTargetView, nullptr);
+
 	// Clear render target
 	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	_deviceContext->ClearRenderTargetView(_renderTargetView, clearColor);
 
-	// Bind render target (Output-Merger stage)
-	_deviceContext->OMSetRenderTargets(1, &_renderTargetView, nullptr);
+	// Set shader constant buffers
+	_deviceContext->VSSetConstantBuffers(0, 1, &_constantBuffer);
 
 	// Set vertex shader stage
 	_deviceContext->VSSetShader(_vertexShader, nullptr, 0);
-	_deviceContext->VSSetConstantBuffers(0, 1, &_constantBuffer);
 
 	// Set pixel shader stage
 	_deviceContext->PSSetShader(_pixelShader, nullptr, 0);
@@ -105,11 +108,11 @@ void Renderer::Update() {
 	if (_time == 0) _time = currentTime;
 
 	// Calculate elapsed time
-	float elapsedTime = (currentTime - _time);
+	float elapsedTime = (float) (currentTime - _time);
 
 	// Calculate object rotation
 	float rotation = elapsedTime / 1000.0f;
-	_objectRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation, rotation, rotation);
+	_objectRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation, rotation, 0);
 
 	// Update model matrix
 	DirectX::XMStoreFloat4x4(&_constantBufferData.model, DirectX::XMMatrixMultiply(_objectTranslation, _objectRotation));
@@ -329,8 +332,8 @@ bool Renderer::InitializeShaders() {
 	// Define shader input layout
 	D3D11_INPUT_ELEMENT_DESC layoutDescription[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	// { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	UINT numLayoutElements = ARRAYSIZE(layoutDescription);

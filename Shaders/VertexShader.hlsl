@@ -19,6 +19,7 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
     float4 pos : SV_Position;
+    float3 normal : NORMAL0;
     float3 col : COLOR0;
 };
 
@@ -29,8 +30,9 @@ VS_OUTPUT main(VS_INPUT i)
 {
     VS_OUTPUT o;
     
-    // Pass on color
+    // Pass through some values
     o.col = i.col;
+    o.normal = i.normal;
     
     // Fetch vertex position
     float4 pos = float4(i.pos, 1.0f);
