@@ -6,95 +6,28 @@
 bool Renderer::Initialize(HWND outputWindow, UINT width, UINT height) {
 
 	// Save parameters
-	outputWindow_ = outputWindow;
-	windowWidth_ = width;
-	windowHeight_ = height;
+	_outputWindow = outputWindow;
+	_windowWidth = width;
+	_windowHeight = height;
 
 	// Direct3D
 	if (!InitializeDirect3D()) return false;
+
+	// Success
+	return true;
+}
+
+/// <summary>
+/// Load object
+/// </summary>
+/// <returns>Load success state</returns>
+bool Renderer::LoadObject() {
 
 	// Load test object
 	LoadTestObject();
 
 	// Buffers
 	if (!InitializeBuffers()) return false;
-
-	// View
-	InitializeView();
-
-	// Success
-	return true;
-}
-
-/// <summary>
-/// Load test object
-/// </summary>
-bool Renderer::LoadTestObject() {
-
-	// Define object vertices in list
-	vertices_ = {
-		{ DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(-0.5f, -0.5f, 0.5f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(-0.5f, 0.5f, -0.5f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(-0.5f, 0.5f, 0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(0.5f, -0.5f, -0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(0.5f, 0.5f, 0.5f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(0.5f, 0.5f, 0.5f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-	};
-
-	// Define indices
-	indices_ = {
-		0, 2, 1,
-		1, 2, 3,
-		4, 5, 6,
-		5, 7, 6,
-		0, 1, 5,
-		0, 5, 4,
-		2, 6, 7,
-		2, 7, 3,
-		0, 4, 6,
-		0, 6, 2,
-		1, 3, 7,
-		1, 7, 5,
-	};
-
-	// Success
-	return true;
-}
-
-/// <summary>
-/// Load test object #2
-/// </summary>
-bool Renderer::LoadTestObject2() {
-
-	// Define object vertices in list
-	vertices_ = {
-		{ DirectX::XMFLOAT3(-1.0f, 1.0f, -1.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(1.0f, 1.0f, -1.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(-1.0f, 1.0f, 1.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(-1.0f, -1.0f, -1.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(1.0f, -1.0f, -1.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(1.0f, -1.0f, 1.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) },
-		{ DirectX::XMFLOAT3(-1.0f, -1.0f, 1.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) },
-	};
-
-	// Define indices
-	indices_ = {
-		3,1,0,
-		2,1,3,
-		0,5,4,
-		1,5,0,
-		3,4,7,
-		0,4,3,
-		1,6,5,
-		2,6,1,
-		2,7,6,
-		3,7,2,
-		6,4,5,
-		7,4,6,
-	};
 
 	return true;
 }
@@ -105,7 +38,7 @@ bool Renderer::LoadTestObject2() {
 void Renderer::Present() {
 
 	// Flip the back buffer
-	swapChain_->Present(0, 0);
+	_swapChain->Present(0, 0);
 }
 
 /// <summary>
@@ -114,21 +47,24 @@ void Renderer::Present() {
 void Renderer::Render() {
 
 	// Update constant buffer
-	deviceContext_->UpdateSubresource(constantBuffer_, 0, nullptr, &constantBufferData_, 0, 0);
+	_deviceContext->UpdateSubresource(_constantBuffer, 0, nullptr, &_constantBufferData, 0, 0);
 
 	// Clear render target
-	float clearColor[4] = { 0.0f, 0.6f, 0.0f, 1.0f };
-	//deviceContext_->ClearRenderTargetView(renderTarget_, clearColor);
+	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
+	_deviceContext->ClearRenderTargetView(_renderTargetView, clearColor);
+
+	// Bind render target (Output-Merger stage)
+	_deviceContext->OMSetRenderTargets(1, &_renderTargetView, nullptr);
 
 	// Set vertex shader stage
-	deviceContext_->VSSetShader(vertexShader_, nullptr, 0);
-	deviceContext_->VSSetConstantBuffers(0, 1, &constantBuffer_);
+	_deviceContext->VSSetShader(_vertexShader, nullptr, 0);
+	_deviceContext->VSSetConstantBuffers(0, 1, &_constantBuffer);
 
 	// Set pixel shader stage
-	deviceContext_->PSSetShader(pixelShader_, nullptr, 0);
+	_deviceContext->PSSetShader(_pixelShader, nullptr, 0);
 
 	// Draw indexed triangles
-	deviceContext_->DrawIndexed(indices_.size(), 0, 0);
+	_deviceContext->DrawIndexed(_indices.size(), 0, 0);
 }
 
 /// <summary>
@@ -137,30 +73,46 @@ void Renderer::Render() {
 void Renderer::Shutdown() {
 
 	// Depth stencil
-	if (depthStencilState_) depthStencilState_->Release();
-	if (depthStencilView_) depthStencilView_->Release();
+	if (_depthStencilState) _depthStencilState->Release();
+	if (_depthStencilView) _depthStencilView->Release();
 
 	// Release shader resources
-	vertexShader_->Release();
-	pixelShader_->Release();
-	inputLayout_->Release();
-	constantBuffer_->Release();
+	_vertexShader->Release();
+	_pixelShader->Release();
+	_inputLayout->Release();
+	_constantBuffer->Release();
 
 	// Release object buffers
-	vertexBuffer_->Release();
-	indexBuffer_->Release();
+	_vertexBuffer->Release();
+	_indexBuffer->Release();
 
 	// D3D resources
-	renderTargetView_->Release();
-	swapChain_->Release();
-	deviceContext_->Release();
-	device_->Release();
+	_renderTargetView->Release();
+	_swapChain->Release();
+	_deviceContext->Release();
+	_device->Release();
 }
 
 /// <summary>
 /// Update the scene
 /// </summary>
 void Renderer::Update() {
+
+	// Get current time
+	ULONGLONG currentTime = GetTickCount64();
+
+	// Initialize start time
+	if (_time == 0) _time = currentTime;
+
+	// Calculate elapsed time
+	float elapsedTime = (currentTime - _time);
+
+	// Calculate object rotation
+	float rotation = elapsedTime / 1000.0f;
+	_objectRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation, rotation, rotation);
+
+	// Update model matrix
+	DirectX::XMStoreFloat4x4(&_constantBufferData.model, DirectX::XMMatrixMultiply(_objectTranslation, _objectRotation));
 }
 
 /// <summary>
@@ -174,40 +126,40 @@ bool Renderer::InitializeBuffers() {
 	ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
 	bufferDescription.Usage = D3D11_USAGE_DEFAULT;
 	bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bufferDescription.ByteWidth = sizeof(VERTEX) * vertices_.size();
+	bufferDescription.ByteWidth = sizeof(VERTEX) * _vertices.size();
 
 	// Create vertex buffer
 	D3D11_SUBRESOURCE_DATA vertexInitData;
 	ZeroMemory(&vertexInitData, sizeof(D3D11_SUBRESOURCE_DATA));
-	vertexInitData.pSysMem = &vertices_[0];
-	HRESULT hr = device_->CreateBuffer(&bufferDescription, &vertexInitData, &vertexBuffer_);
+	vertexInitData.pSysMem = &_vertices[0];
+	HRESULT hr = _device->CreateBuffer(&bufferDescription, &vertexInitData, &_vertexBuffer);
 	if (FAILED(hr)) return false;
 
 	// Set vertex buffer (Input-Assembler stage)
 	UINT stride = sizeof(VERTEX);
 	UINT offset = 0;
-	deviceContext_->IASetVertexBuffers(0, 1, &vertexBuffer_, &stride, &offset);
+	_deviceContext->IASetVertexBuffers(0, 1, &_vertexBuffer, &stride, &offset);
 
 	// Configure index buffer description
 	bufferDescription.Usage = D3D11_USAGE_DEFAULT;
-	bufferDescription.ByteWidth = sizeof(WORD) * indices_.size();
+	bufferDescription.ByteWidth = sizeof(WORD) * _indices.size();
 	bufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	bufferDescription.CPUAccessFlags = 0;
 
 	// Configure index buffer initialization data
 	D3D11_SUBRESOURCE_DATA indexInitData;
 	ZeroMemory(&indexInitData, sizeof(D3D11_SUBRESOURCE_DATA));
-	indexInitData.pSysMem = &indices_[0];
+	indexInitData.pSysMem = &_indices[0];
 
 	// Create index buffer
-	hr = device_->CreateBuffer(&bufferDescription, &indexInitData, &indexBuffer_);
+	hr = _device->CreateBuffer(&bufferDescription, &indexInitData, &_indexBuffer);
 	if (FAILED(hr)) return false;
 
 	// Set index buffer
-	deviceContext_->IASetIndexBuffer(indexBuffer_, DXGI_FORMAT_R16_UINT, 0);
+	_deviceContext->IASetIndexBuffer(_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
 	// Configure primitive topology
-	deviceContext_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return true;
 }
@@ -232,6 +184,9 @@ bool Renderer::InitializeDirect3D() {
 
 	// Depth stencil
 	//if (!InitializeDepthStencil()) return false;
+
+	// View
+	InitializeView();
 
 	// Success
 	return true;
@@ -263,14 +218,14 @@ bool Renderer::InitializeDevice() {
 	ZeroMemory(&swapChainParams, sizeof(DXGI_SWAP_CHAIN_DESC));
 	swapChainParams.Windowed = TRUE;
 	swapChainParams.BufferCount = 2;
-	swapChainParams.BufferDesc.Width = windowWidth_;
-	swapChainParams.BufferDesc.Height = windowHeight_;
+	swapChainParams.BufferDesc.Width = _windowWidth;
+	swapChainParams.BufferDesc.Height = _windowHeight;
 	swapChainParams.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	swapChainParams.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainParams.SampleDesc.Count = 1;
 	swapChainParams.SampleDesc.Quality = 0;
 	swapChainParams.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-	swapChainParams.OutputWindow = outputWindow_;
+	swapChainParams.OutputWindow = _outputWindow;
 
 	// Create D3D device, context and swap chain
 	HRESULT hr;
@@ -283,10 +238,10 @@ bool Renderer::InitializeDevice() {
 		numFeatureLevels,           // Size of the feature levels array
 		D3D11_SDK_VERSION,          // D3D SDK version
 		&swapChainParams,           // Swap chain parameters
-		&swapChain_,                // Swap chain
-		&device_,                   // Return created D3D device
-		&deviceFeatureLevel_,       // Return selected feature level
-		&deviceContext_             // Return created D3D device context
+		&_swapChain,                // Swap chain
+		&_device,                   // Return created D3D device
+		&_deviceFeatureLevel,       // Return selected feature level
+		&_deviceContext             // Return created D3D device context
 	);
 
 	// Check for errors
@@ -306,18 +261,15 @@ bool Renderer::InitializeRenderTargetView() {
 
 	// Get back buffer from swap chain
 	ID3D11Resource* backBuffer;
-	HRESULT hr = swapChain_->GetBuffer(0, __uuidof(backBuffer), (void**)&backBuffer);
+	HRESULT hr = _swapChain->GetBuffer(0, __uuidof(backBuffer), (void**)&backBuffer);
 	assert(!FAILED(hr));
 
 	// Create render target view
-	hr = device_->CreateRenderTargetView(backBuffer, NULL, &renderTargetView_);
+	hr = _device->CreateRenderTargetView(backBuffer, NULL, &_renderTargetView);
 	assert(!FAILED(hr));
 
 	// Release the ref count on the back buffer (from GetBuffer)
 	backBuffer->Release();
-
-	// Bind render target (Output-Merger stage)
-	deviceContext_->OMSetRenderTargets(1, &renderTargetView_, nullptr);
 
 	return true;
 }
@@ -345,7 +297,7 @@ bool Renderer::InitializeShaders() {
 	}
 
 	// Create shader from compiled code
-	hr = device_->CreateVertexShader(compiledVS->GetBufferPointer(), compiledVS->GetBufferSize(), nullptr, &vertexShader_);
+	hr = _device->CreateVertexShader(compiledVS->GetBufferPointer(), compiledVS->GetBufferSize(), nullptr, &_vertexShader);
 	if (FAILED(hr)) {
 		if (compiledVS) compiledVS->Release();
 		MessageBox( nullptr, L"Error creating vertex shader", L"Shader Initialization Error", MB_OK );
@@ -363,7 +315,7 @@ bool Renderer::InitializeShaders() {
 	}
 
 	// Create shader from compiled code
-	hr = device_->CreatePixelShader(compiledPS->GetBufferPointer(), compiledPS->GetBufferSize(), nullptr, &pixelShader_);
+	hr = _device->CreatePixelShader(compiledPS->GetBufferPointer(), compiledPS->GetBufferSize(), nullptr, &_pixelShader);
 	if (FAILED(hr)) {
 		if (compiledVS) compiledVS->Release();
 		if (compiledPS) compiledPS->Release();
@@ -383,7 +335,7 @@ bool Renderer::InitializeShaders() {
 	UINT numLayoutElements = ARRAYSIZE(layoutDescription);
 
 	// Create input layout
-	hr = device_->CreateInputLayout(layoutDescription, numLayoutElements, compiledVS->GetBufferPointer(), compiledVS->GetBufferSize(), &inputLayout_);
+	hr = _device->CreateInputLayout(layoutDescription, numLayoutElements, compiledVS->GetBufferPointer(), compiledVS->GetBufferSize(), &_inputLayout);
 	if (FAILED(hr)) {
 		if (compiledVS) compiledVS->Release();
 		if (compiledPS) compiledPS->Release();
@@ -391,7 +343,7 @@ bool Renderer::InitializeShaders() {
 	}
 
 	// Set input layout for shaders
-	deviceContext_->IASetInputLayout(inputLayout_);
+	_deviceContext->IASetInputLayout(_inputLayout);
 
 	// Release resources
 	if (compiledVS) compiledVS->Release();
@@ -409,8 +361,8 @@ bool Renderer::InitializeDepthStencil() {
 	// Describe depth stencil
 	D3D11_TEXTURE2D_DESC depthStencilTextureDescription;
 	ZeroMemory(&depthStencilTextureDescription, sizeof(D3D11_TEXTURE2D_DESC));
-	depthStencilTextureDescription.Width = windowWidth_;
-	depthStencilTextureDescription.Height = windowHeight_;
+	depthStencilTextureDescription.Width = _windowWidth;
+	depthStencilTextureDescription.Height = _windowHeight;
 	depthStencilTextureDescription.MipLevels = 1;
 	depthStencilTextureDescription.ArraySize = 1;
 	depthStencilTextureDescription.SampleDesc.Count = 1;
@@ -420,7 +372,7 @@ bool Renderer::InitializeDepthStencil() {
 
 	// Create depth stencil texture
 	ID3D11Texture2D* depthStencilTexture;
-	HRESULT hr = device_->CreateTexture2D(&depthStencilTextureDescription, nullptr, &depthStencilTexture);
+	HRESULT hr = _device->CreateTexture2D(&depthStencilTextureDescription, nullptr, &depthStencilTexture);
 	assert(!FAILED(hr));
 
 	// Set depth stencil state
@@ -429,10 +381,10 @@ bool Renderer::InitializeDepthStencil() {
 	depthStencilDescription.DepthEnable = TRUE;
 	depthStencilDescription.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDescription.DepthFunc = D3D11_COMPARISON_LESS;
-	hr = device_->CreateDepthStencilState(&depthStencilDescription, &depthStencilState_);
+	hr = _device->CreateDepthStencilState(&depthStencilDescription, &_depthStencilState);
 
 	// Bind the depth stencil state to the OM stage
-	deviceContext_->OMSetDepthStencilState(depthStencilState_, 1);
+	_deviceContext->OMSetDepthStencilState(_depthStencilState, 1);
 
 	// Create the depth stencil
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDescription;
@@ -440,7 +392,7 @@ bool Renderer::InitializeDepthStencil() {
 	depthStencilViewDescription.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depthStencilViewDescription.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilViewDescription.Texture2D.MipSlice = 0;
-	hr = device_->CreateDepthStencilView(depthStencilTexture, &depthStencilViewDescription, &depthStencilView_);
+	hr = _device->CreateDepthStencilView(depthStencilTexture, &depthStencilViewDescription, &_depthStencilView);
 	assert(!FAILED(hr));
 
 	return true;
@@ -454,7 +406,7 @@ bool Renderer::InitializeView() {
 
 	// Set up model matrix
 	DirectX::XMMATRIX modelMatrixTranspose = DirectX::XMMatrixTranspose(DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f));
-	DirectX::XMStoreFloat4x4(&constantBufferData_.model, modelMatrixTranspose);
+	DirectX::XMStoreFloat4x4(&_constantBufferData.model, modelMatrixTranspose);
 
 	// Set up view matrix
 	DirectX::XMVECTOR eyePt = DirectX::XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f);
@@ -462,22 +414,22 @@ bool Renderer::InitializeView() {
 	DirectX::XMVECTOR upVec = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	DirectX::XMMATRIX lookAtMatrix = DirectX::XMMatrixLookAtRH(eyePt, lookAt, upVec);
 	DirectX::XMMATRIX lookAtMatrixTranspose = DirectX::XMMatrixTranspose(lookAtMatrix);
-	DirectX::XMStoreFloat4x4(&constantBufferData_.view, lookAtMatrixTranspose);
+	DirectX::XMStoreFloat4x4(&_constantBufferData.view, lookAtMatrixTranspose);
 
 	// Set up projection matrix
-	float aspectRatio = ((float)windowWidth_ / (float)windowHeight_);
+	float aspectRatio = ((float)_windowWidth / (float)_windowHeight);
 	float fovAngleY = 70.0f * DirectX::XM_PI / 180.0f;
 	float nearPlane = 0.01f;
 	float farPlane = 500.0f;
 	DirectX::XMMATRIX perspectiveMatrix = DirectX::XMMatrixPerspectiveFovRH(fovAngleY, aspectRatio, nearPlane, farPlane);
 	DirectX::XMMATRIX perspectiveMatrixTranspose = DirectX::XMMatrixTranspose(perspectiveMatrix);
-	DirectX::XMStoreFloat4x4(&constantBufferData_.projection, perspectiveMatrixTranspose);
+	DirectX::XMStoreFloat4x4(&_constantBufferData.projection, perspectiveMatrixTranspose);
 
 	// Define constant buffer elements to feed transformations to shader
-	CD3D11_BUFFER_DESC constantBufferDesc(sizeof(constantBufferData_), D3D11_BIND_CONSTANT_BUFFER);
+	CD3D11_BUFFER_DESC constantBufferDesc(sizeof(_constantBufferData), D3D11_BIND_CONSTANT_BUFFER);
 
 	// Create constant buffer 
-	HRESULT hr = device_->CreateBuffer(&constantBufferDesc, nullptr, &constantBuffer_);
+	HRESULT hr = _device->CreateBuffer(&constantBufferDesc, nullptr, &_constantBuffer);
 	if (FAILED(hr)) {
 		return false;
 	}
@@ -492,14 +444,14 @@ bool Renderer::InitializeView() {
 bool Renderer::InitializeViewport() {
 
 	// Initialize viewport parameters
-	ZeroMemory(&viewport_, sizeof(D3D11_VIEWPORT));
-	viewport_.Height = (float)windowWidth_;
-	viewport_.Width = (float)windowHeight_;
-	viewport_.MinDepth = 0;
-	viewport_.MaxDepth = 1;
+	ZeroMemory(&_viewport, sizeof(D3D11_VIEWPORT));
+	_viewport.Height = (float)_windowWidth;
+	_viewport.Width = (float)_windowHeight;
+	_viewport.MinDepth = 0;
+	_viewport.MaxDepth = 1;
 
 	// Set viewport
-	deviceContext_->RSSetViewports(1, &viewport_);
+	_deviceContext->RSSetViewports(1, &_viewport);
 
 	return true;
 }
@@ -538,4 +490,45 @@ ID3DBlob* Renderer::CompileShaderFromFile(LPCWSTR shaderPathname, LPCSTR compile
 	if (compilationErrors) compilationErrors->Release();
 
 	return compiledShader;
+}
+
+/// <summary>
+/// Load test object
+/// </summary>
+bool Renderer::LoadTestObject() {
+
+	// Define object vertices in list
+	_vertices = {
+		{ DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 0
+		{ DirectX::XMFLOAT3(-0.5f, -0.5f,  0.5f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 1
+		{ DirectX::XMFLOAT3(-0.5f,  0.5f, -0.5f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 2
+		{ DirectX::XMFLOAT3(-0.5f,  0.5f,  0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 3
+		{ DirectX::XMFLOAT3( 0.5f, -0.5f, -0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 4
+		{ DirectX::XMFLOAT3( 0.5f, -0.5f,  0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 5
+		{ DirectX::XMFLOAT3( 0.5f,  0.5f,  -0.5f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 6
+		{ DirectX::XMFLOAT3( 0.5f,  0.5f,  0.5f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 7
+	};
+
+	// Define indices
+	_indices = {
+		0, 2, 1,
+		1, 2, 3,
+		4, 5, 6,
+		5, 7, 6,
+		0, 1, 5,
+		0, 5, 4,
+		2, 6, 7,
+		2, 7, 3,
+		0, 4, 6,
+		0, 6, 2,
+		1, 3, 7,
+		1, 7, 5,
+	};
+
+	// Set initial transformations
+	_objectTranslation = DirectX::XMMatrixTranslation(0, 0, 0);
+	_objectRotation = DirectX::XMMatrixIdentity();
+
+	// Success
+	return true;
 }

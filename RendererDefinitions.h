@@ -13,6 +13,15 @@ struct VERTEX {
 };
 
 //
+// Constant buffer definition
+// Constant buffer data definition
+struct VS_CONSTANT_BUFFER_DATA {
+	DirectX::XMFLOAT4X4 model;
+	DirectX::XMFLOAT4X4 view;
+	DirectX::XMFLOAT4X4 projection;
+};
+
+//
 // Shader constants
 //
 const LPCSTR SHADER_ENTRY_POINT = "main";

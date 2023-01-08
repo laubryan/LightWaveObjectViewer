@@ -48,7 +48,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	if (!renderer.Initialize(mainWindow, WINDOW_WIDTH, WINDOW_HEIGHT)) return 0;
 
 	// Load sample object
-	//renderer.LoadTestObject();
+	renderer.LoadObject();
 
 	// Peek at initial message in queue
 	MSG msg;
