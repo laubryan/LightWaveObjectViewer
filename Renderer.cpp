@@ -329,6 +329,7 @@ bool Renderer::InitializeShaders() {
 	// Define shader input layout
 	D3D11_INPUT_ELEMENT_DESC layoutDescription[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	// { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -499,14 +500,14 @@ bool Renderer::LoadTestObject() {
 
 	// Define object vertices in list
 	_vertices = {
-		{ DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 0
-		{ DirectX::XMFLOAT3(-0.5f, -0.5f,  0.5f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 1
-		{ DirectX::XMFLOAT3(-0.5f,  0.5f, -0.5f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 2
-		{ DirectX::XMFLOAT3(-0.5f,  0.5f,  0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 3
-		{ DirectX::XMFLOAT3(0.5f, -0.5f, -0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 4
-		{ DirectX::XMFLOAT3(0.5f, -0.5f,  0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 5
-		{ DirectX::XMFLOAT3(0.5f,  0.5f, -0.5f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 6
-		{ DirectX::XMFLOAT3(0.5f,  0.5f,  0.5f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 7
+		{ DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3(-0.58f, -0.58f, -0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 0
+		{ DirectX::XMFLOAT3(-0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3(-0.58f, -0.58f,  0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 1
+		{ DirectX::XMFLOAT3(-0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3(-0.58f,  0.58f, -0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 2
+		{ DirectX::XMFLOAT3(-0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3(-0.58f,  0.58f,  0.58f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 3
+		{ DirectX::XMFLOAT3( 0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3( 0.58f, -0.58f, -0.58f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 4
+		{ DirectX::XMFLOAT3( 0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3( 0.58f, -0.58f,  0.58f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 5
+		{ DirectX::XMFLOAT3( 0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3( 0.58f,  0.58f, -0.58f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 6
+		{ DirectX::XMFLOAT3( 0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3( 0.58f,  0.58f,  0.58f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 7
 	};
 
 	// Define indices

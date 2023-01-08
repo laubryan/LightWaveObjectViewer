@@ -12,6 +12,7 @@ cbuffer ModelViewProjectionCB : register(b0)
 struct VS_INPUT
 {
     float3 pos : POSITION;
+    float3 normal : NORMAL0;
     float3 col : COLOR0;
 };
 
