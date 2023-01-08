@@ -5,8 +5,12 @@
 cbuffer ModelViewProjectionCB : register(b0)
 {
     matrix model;
-    matrix view;
-    matrix projection;
+};
+
+cbuffer LightCB : register(b1)
+{
+    matrix lightPosition;
+    matrix viewProjection;
 };
 
 struct VS_INPUT
@@ -19,7 +23,6 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
     float4 pos : SV_Position;
-    float3 normal : NORMAL0;
     float3 col : COLOR0;
 };
 
@@ -32,7 +35,6 @@ VS_OUTPUT main(VS_INPUT i)
     
     // Pass through some values
     o.col = i.col;
-    o.normal = i.normal;
     
     // Fetch vertex position
     float4 pos = float4(i.pos, 1.0f);
@@ -41,10 +43,13 @@ VS_OUTPUT main(VS_INPUT i)
     pos = mul(pos, model);
     
     // Transform camera to world
-    pos = mul(pos, view);
+    //pos = mul(pos, view);
     
     // Apply projection matrix
-    o.pos = mul(pos, projection);
+    //o.pos = mul(pos, projection);
+    
+    // Apply view-projection transformation
+    o.pos = mul(pos, viewProjection);
     
     return o;
 }

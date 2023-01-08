@@ -29,7 +29,8 @@ private:
 	bool InitializeRenderTargetView();
 	bool InitializeShaders();
 	bool InitializeDepthStencil();
-	bool InitializeView();
+	bool InitializeFrameConstantBuffer();
+	bool InitializeStaticConstantBuffer();
 	bool InitializeViewport();
 
 	ID3DBlob* CompileShaderFromFile(LPCWSTR shaderPathname, LPCSTR compilerTarget);
@@ -57,9 +58,13 @@ private:
 	ID3D11Buffer* _vertexBuffer;			// Object vertex buffer
 	ID3D11Buffer* _indexBuffer;				// Object index buffer
 
-	// Constant buffer
-	ID3D11Buffer* _constantBuffer;			// Shader constant buffer
-	VS_CONSTANT_BUFFER_DATA _constantBufferData;
+	// Per-frame constant buffer
+	ID3D11Buffer* _frameConstantBuffer;					
+	CONSTANT_BUFFER_FRAME _frameConstantBufferData;
+
+	// Static constant buffer
+	ID3D11Buffer* _staticConstantBuffer;					
+	CONSTANT_BUFFER_STATIC _staticConstantBufferData;
 
 	// Window
 	D3D11_VIEWPORT _viewport;

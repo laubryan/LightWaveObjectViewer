@@ -14,12 +14,18 @@ struct VERTEX {
 };
 
 //
-// Constant buffer definition
-// Constant buffer data definition
-struct VS_CONSTANT_BUFFER_DATA {
+// Per-frame constant buffer
+//
+struct CONSTANT_BUFFER_FRAME {
 	DirectX::XMFLOAT4X4 model;
-	DirectX::XMFLOAT4X4 view;
-	DirectX::XMFLOAT4X4 projection;
+};
+
+//
+// Static constant buffer
+//
+struct CONSTANT_BUFFER_STATIC {
+	DirectX::XMFLOAT4X4 lightPosition;
+	DirectX::XMFLOAT4X4 viewProjection;
 };
 
 //
