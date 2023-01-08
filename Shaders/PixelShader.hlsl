@@ -2,6 +2,12 @@
 // Pixel Shader
 //
 
+cbuffer psCB : register(b1)
+{
+    matrix lightPosition;
+    matrix viewProjection;
+};
+
 struct PS_INPUT
 {
     float4 position : SV_POSITION;

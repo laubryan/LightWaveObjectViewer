@@ -14,16 +14,16 @@ struct VERTEX {
 };
 
 //
-// Per-frame constant buffer
+// Vertex shader constant buffer
 //
-struct CONSTANT_BUFFER_FRAME {
-	DirectX::XMFLOAT4X4 model;
+struct CONSTANT_BUFFER_VS {
+	DirectX::XMFLOAT4X4 worldViewProj;
 };
 
 //
-// Static constant buffer
+// Pixel shader constant buffer
 //
-struct CONSTANT_BUFFER_STATIC {
+struct CONSTANT_BUFFER_PS {
 	DirectX::XMFLOAT4X4 lightPosition;
 	DirectX::XMFLOAT4X4 viewProjection;
 };

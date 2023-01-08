@@ -23,15 +23,15 @@ public:
 private:
 
 	// Private member functdions
-	bool InitializeBuffers();
 	bool InitializeDirect3D();
 	bool InitializeDevice();
 	bool InitializeRenderTargetView();
 	bool InitializeShaders();
 	bool InitializeDepthStencil();
-	bool InitializeFrameConstantBuffer();
-	bool InitializeStaticConstantBuffer();
 	bool InitializeViewport();
+
+	bool InitializeBuffers();
+	bool InitializeObjectTransforms();
 
 	ID3DBlob* CompileShaderFromFile(LPCWSTR shaderPathname, LPCSTR compilerTarget);
 
@@ -58,13 +58,13 @@ private:
 	ID3D11Buffer* _vertexBuffer;			// Object vertex buffer
 	ID3D11Buffer* _indexBuffer;				// Object index buffer
 
-	// Per-frame constant buffer
-	ID3D11Buffer* _frameConstantBuffer;					
-	CONSTANT_BUFFER_FRAME _frameConstantBufferData;
+	// Vertex shader constant buffer
+	ID3D11Buffer* _vsConstantBuffer;					
+	CONSTANT_BUFFER_VS _vsConstantBufferData;
 
-	// Static constant buffer
-	ID3D11Buffer* _staticConstantBuffer;					
-	CONSTANT_BUFFER_STATIC _staticConstantBufferData;
+	// Pixel shader constant buffer
+	ID3D11Buffer* _psConstantBuffer;					
+	CONSTANT_BUFFER_PS _psConstantBufferData;
 
 	// Window
 	D3D11_VIEWPORT _viewport;
@@ -80,6 +80,9 @@ private:
 	// Transformations
 	DirectX::XMMATRIX _objectTranslation;
 	DirectX::XMMATRIX _objectRotation;
+	DirectX::XMMATRIX _worldMatrix;
+	DirectX::XMMATRIX _viewMatrix;
+	DirectX::XMMATRIX _projectionMatrix;
 
 	// Timer
 	ULONGLONG _time = 0;

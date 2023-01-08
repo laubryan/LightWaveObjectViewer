@@ -29,6 +29,9 @@ bool Renderer::LoadObject() {
 	// Buffers
 	if (!InitializeBuffers()) return false;
 
+	// Initialize transforms
+	if (!InitializeObjectTransforms()) return false;
+
 	return true;
 }
 
@@ -47,8 +50,8 @@ void Renderer::Present() {
 /// </summary>
 void Renderer::Render() {
 
-	// Update constant buffer
-	_deviceContext->UpdateSubresource(_frameConstantBuffer, 0, nullptr, &_frameConstantBufferData, 0, 0);
+	// Update constant buffers
+	_deviceContext->UpdateSubresource(_vsConstantBuffer, 0, nullptr, &_vsConstantBufferData, 0, 0);
 
 	// Bind render target (Output-Merger stage)
 	_deviceContext->OMSetRenderTargets(1, &_renderTargetView, nullptr);
@@ -57,11 +60,9 @@ void Renderer::Render() {
 	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	_deviceContext->ClearRenderTargetView(_renderTargetView, clearColor);
 
-	// Set per-frame constant buffer
-	_deviceContext->VSSetConstantBuffers(0, 1, &_frameConstantBuffer);
-
-	// Set static constant buffer
-	_deviceContext->VSSetConstantBuffers(1, 1, &_staticConstantBuffer);
+	// Set constant buffers
+	_deviceContext->VSSetConstantBuffers(0, 1, &_vsConstantBuffer); // Register b0
+	_deviceContext->VSSetConstantBuffers(1, 1, &_psConstantBuffer); // Register b1
 
 	// Set vertex shader stage
 	_deviceContext->VSSetShader(_vertexShader, nullptr, 0);
@@ -88,8 +89,8 @@ void Renderer::Shutdown() {
 	_inputLayout->Release();
 
 	// Constant buffers
-	_frameConstantBuffer->Release();
-	_staticConstantBuffer->Release();
+	_vsConstantBuffer->Release();
+	_psConstantBuffer->Release();
 
 	// Object buffers
 	_vertexBuffer->Release();
@@ -114,63 +115,18 @@ void Renderer::Update() {
 	if (_time == 0) _time = currentTime;
 
 	// Calculate elapsed time
-	float elapsedTime = (float) (currentTime - _time);
+	float elapsedTime = (float)(currentTime - _time);
 
 	// Calculate object rotation
 	float rotation = elapsedTime / 1000.0f;
 	_objectRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation, rotation, 0);
 
-	// Update model matrix
-	DirectX::XMStoreFloat4x4(&_frameConstantBufferData.model, DirectX::XMMatrixMultiply(_objectTranslation, _objectRotation));
-}
+	// Update world matrix
+	_worldMatrix = DirectX::XMMatrixTranspose(_objectTranslation * _objectRotation);
 
-/// <summary>
-/// Initialize vertex, pixel and constant buffers
-/// </summary>
-/// <returns>Initialization success</returns>
-bool Renderer::InitializeBuffers() {
-
-	// Describe vertex buffer description and initialization data
-	D3D11_BUFFER_DESC bufferDescription;
-	ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
-	bufferDescription.Usage = D3D11_USAGE_DEFAULT;
-	bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bufferDescription.ByteWidth = sizeof(VERTEX) * _vertices.size();
-
-	// Create vertex buffer
-	D3D11_SUBRESOURCE_DATA vertexInitData;
-	ZeroMemory(&vertexInitData, sizeof(D3D11_SUBRESOURCE_DATA));
-	vertexInitData.pSysMem = &_vertices[0];
-	HRESULT hr = _device->CreateBuffer(&bufferDescription, &vertexInitData, &_vertexBuffer);
-	if (FAILED(hr)) return false;
-
-	// Set vertex buffer (Input-Assembler stage)
-	UINT stride = sizeof(VERTEX);
-	UINT offset = 0;
-	_deviceContext->IASetVertexBuffers(0, 1, &_vertexBuffer, &stride, &offset);
-
-	// Configure index buffer description
-	bufferDescription.Usage = D3D11_USAGE_DEFAULT;
-	bufferDescription.ByteWidth = sizeof(WORD) * _indices.size();
-	bufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	bufferDescription.CPUAccessFlags = 0;
-
-	// Configure index buffer initialization data
-	D3D11_SUBRESOURCE_DATA indexInitData;
-	ZeroMemory(&indexInitData, sizeof(D3D11_SUBRESOURCE_DATA));
-	indexInitData.pSysMem = &_indices[0];
-
-	// Create index buffer
-	hr = _device->CreateBuffer(&bufferDescription, &indexInitData, &_indexBuffer);
-	if (FAILED(hr)) return false;
-
-	// Set index buffer
-	_deviceContext->IASetIndexBuffer(_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
-
-	// Configure primitive topology
-	_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	return true;
+	// Update world-view-projection
+	DirectX::XMMATRIX worldViewProjectionMatrix = _projectionMatrix * _viewMatrix * _worldMatrix;
+	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.worldViewProj, worldViewProjectionMatrix);
 }
 
 /// <summary>
@@ -190,12 +146,6 @@ bool Renderer::InitializeDirect3D() {
 
 	// Shaders
 	if (!InitializeShaders()) return false;
-
-	// Initialize static constant buffers
-	if (!InitializeStaticConstantBuffer()) return false;
-
-	// View
-	InitializeFrameConstantBuffer();
 
 	// Success
 	return true;
@@ -409,70 +359,6 @@ bool Renderer::InitializeDepthStencil() {
 }
 
 /// <summary>
-/// Initialize per-frame constant buffer
-/// </summary>
-/// <returns>Initialization success</returns>
-bool Renderer::InitializeFrameConstantBuffer() {
-
-	// Set up model matrix
-	DirectX::XMMATRIX modelMatrixTranspose = DirectX::XMMatrixTranspose(DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f));
-	DirectX::XMStoreFloat4x4(&_frameConstantBufferData.model, modelMatrixTranspose);
-
-	// Define constant buffer elements to feed transformations to shader
-	CD3D11_BUFFER_DESC constantBufferDesc(sizeof(_frameConstantBufferData), D3D11_BIND_CONSTANT_BUFFER);
-
-	// Create constant buffer 
-	HRESULT hr = _device->CreateBuffer(&constantBufferDesc, nullptr, &_frameConstantBuffer);
-	if (FAILED(hr)) {
-		return false;
-	}
-
-	return true;
-}
-
-/// <summary>
-/// Initialize static constant buffer
-/// </summary>
-/// <returns>Initialization success</returns>
-bool Renderer::InitializeStaticConstantBuffer() {
-
-	// Store light position in static constant buffer
-	DirectX::XMMATRIX lightPositionMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixTranslation(10.0f, 8.0f, -10.0f));
-	DirectX::XMStoreFloat4x4(&_staticConstantBufferData.lightPosition, lightPositionMatrix);
-
-	// Calculate view matrix
-	DirectX::XMVECTOR eyePt = DirectX::XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f);
-	DirectX::XMVECTOR lookAt = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	DirectX::XMVECTOR upVec = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtRH(eyePt, lookAt, upVec);
-
-	// Calculate projection matrix
-	float aspectRatio = (float)_windowWidth / (float)_windowHeight;
-	float fovAngleY = 45.0f * (DirectX::XM_PI / 180.0f);
-	float nearPlane = 0.01f;
-	float farPlane = 500.0f;
-	DirectX::XMMATRIX projectionMatrix = DirectX::XMMatrixPerspectiveFovRH(fovAngleY, aspectRatio, nearPlane, farPlane);
-
-	// Store view-projection matrix in static constant buffer
-	DirectX::XMMATRIX viewProjectionMatrix = DirectX::XMMatrixTranspose(viewMatrix * projectionMatrix);
-	DirectX::XMStoreFloat4x4(&_staticConstantBufferData.viewProjection, viewProjectionMatrix);
-
-	// Define static constant buffer
-	CD3D11_BUFFER_DESC constantBufferDesc(sizeof(_staticConstantBufferData), D3D11_BIND_CONSTANT_BUFFER);
-
-	// Create static constant buffer 
-	HRESULT hr = _device->CreateBuffer(&constantBufferDesc, nullptr, &_staticConstantBuffer);
-	if (FAILED(hr)) {
-		return false;
-	}
-
-	// Update static constant buffer
-	_deviceContext->UpdateSubresource(_staticConstantBuffer, 0, nullptr, &_staticConstantBufferData, 0, 0);
-
-	return true;
-}
-
-/// <summary>
 /// Initialize viewport
 /// </summary>
 /// <returns>Initialization success</returns>
@@ -487,6 +373,115 @@ bool Renderer::InitializeViewport() {
 
 	// Set viewport
 	_deviceContext->RSSetViewports(1, &_viewport);
+
+	return true;
+}
+
+/// <summary>
+/// Initialize vertex, pixel and constant buffers
+/// </summary>
+/// <returns>Initialization success</returns>
+bool Renderer::InitializeBuffers() {
+
+	HRESULT hr;
+
+	///////////////////////////////////////
+	// Vertex Buffer
+
+	// Describe vertex buffer description and initialization data
+	D3D11_BUFFER_DESC bufferDescription;
+	ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
+	bufferDescription.Usage = D3D11_USAGE_DEFAULT;
+	bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bufferDescription.ByteWidth = sizeof(VERTEX) * _vertices.size();
+
+	// Create vertex buffer
+	D3D11_SUBRESOURCE_DATA vertexInitData;
+	ZeroMemory(&vertexInitData, sizeof(D3D11_SUBRESOURCE_DATA));
+	vertexInitData.pSysMem = &_vertices[0];
+	hr = _device->CreateBuffer(&bufferDescription, &vertexInitData, &_vertexBuffer);
+	if (FAILED(hr)) return false;
+
+	// Set vertex buffer (Input-Assembler stage)
+	UINT stride = sizeof(VERTEX);
+	UINT offset = 0;
+	_deviceContext->IASetVertexBuffers(0, 1, &_vertexBuffer, &stride, &offset);
+
+	///////////////////////////////////////
+	// Index Buffer
+
+	// Configure index buffer description
+	bufferDescription.Usage = D3D11_USAGE_DEFAULT;
+	bufferDescription.ByteWidth = sizeof(WORD) * _indices.size();
+	bufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	bufferDescription.CPUAccessFlags = 0;
+
+	// Configure index buffer initialization data
+	D3D11_SUBRESOURCE_DATA indexInitData;
+	ZeroMemory(&indexInitData, sizeof(D3D11_SUBRESOURCE_DATA));
+	indexInitData.pSysMem = &_indices[0];
+
+	// Create index buffer
+	hr = _device->CreateBuffer(&bufferDescription, &indexInitData, &_indexBuffer);
+	if (FAILED(hr)) return false;
+
+	// Set index buffer
+	_deviceContext->IASetIndexBuffer(_indexBuffer, DXGI_FORMAT_R16_UINT, 0);
+
+	// Configure primitive topology
+	_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	///////////////////////////////////////
+	// Constant Buffers
+
+	// Create vertex shader constant buffer 
+	CD3D11_BUFFER_DESC vsConstantBufferDesc(sizeof(_vsConstantBufferData), D3D11_BIND_CONSTANT_BUFFER);
+	hr = _device->CreateBuffer(&vsConstantBufferDesc, nullptr, &_vsConstantBuffer);
+	if (FAILED(hr)) {
+		return false;
+	}
+
+	// Create pixel shader constant buffer 
+	CD3D11_BUFFER_DESC psConstantBufferDesc(sizeof(_psConstantBufferData), D3D11_BIND_CONSTANT_BUFFER);
+	hr = _device->CreateBuffer(&psConstantBufferDesc, nullptr, &_psConstantBuffer);
+	if (FAILED(hr)) {
+		return false;
+	}
+
+	return true;
+}
+
+/// <summary>
+/// Initialize and store object transformations
+/// </summary>
+/// <returns></returns>
+bool Renderer::InitializeObjectTransforms() {
+
+	// Store light position
+	DirectX::XMMATRIX lightPositionMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixTranslation(10.0f, 8.0f, -10.0f));
+	DirectX::XMStoreFloat4x4(&_psConstantBufferData.lightPosition, lightPositionMatrix);
+
+	// Calculate and store world matrix (for object)
+	_objectTranslation = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	_objectRotation = DirectX::XMMatrixIdentity();
+	_worldMatrix = DirectX::XMMatrixTranspose(_objectTranslation * _objectRotation);
+
+	// Calculate view matrix
+	DirectX::XMVECTOR eyePt = DirectX::XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f);
+	DirectX::XMVECTOR lookAt = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	DirectX::XMVECTOR upVec = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	_viewMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtRH(eyePt, lookAt, upVec));
+
+	// Calculate projection matrix
+	float aspectRatio = (float)_windowWidth / (float)_windowHeight;
+	float fovAngleY = 45.0f * (DirectX::XM_PI / 180.0f);
+	float nearPlane = 0.01f;
+	float farPlane = 500.0f;
+	_projectionMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixPerspectiveFovRH(fovAngleY, aspectRatio, nearPlane, farPlane));
+
+	// Calculate and store world-view-projection matrix
+	DirectX::XMMATRIX worldViewProjectionMatrix = _projectionMatrix * _viewMatrix * _worldMatrix;
+	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.worldViewProj, worldViewProjectionMatrix);
 
 	return true;
 }
