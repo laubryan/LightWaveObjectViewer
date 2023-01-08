@@ -292,7 +292,7 @@ bool Renderer::InitializeShaders() {
 	// Compile vertex shader from file
 	ID3DBlob* compiledVS = CompileShaderFromFile(vsFilename, VS_COMPILER_TARGET);
 	if (compiledVS == nullptr) {
-		MessageBox( nullptr, L"Error compiling vertex shader", L"Shader Initialization Error", MB_OK );
+		MessageBox(nullptr, L"Error compiling vertex shader", L"Shader Initialization Error", MB_OK);
 		return false;
 	}
 
@@ -300,7 +300,7 @@ bool Renderer::InitializeShaders() {
 	hr = _device->CreateVertexShader(compiledVS->GetBufferPointer(), compiledVS->GetBufferSize(), nullptr, &_vertexShader);
 	if (FAILED(hr)) {
 		if (compiledVS) compiledVS->Release();
-		MessageBox( nullptr, L"Error creating vertex shader", L"Shader Initialization Error", MB_OK );
+		MessageBox(nullptr, L"Error creating vertex shader", L"Shader Initialization Error", MB_OK);
 		return false;
 	}
 
@@ -310,7 +310,7 @@ bool Renderer::InitializeShaders() {
 	// Compile pixel shader from file
 	ID3DBlob* compiledPS = CompileShaderFromFile(psFilename, PS_COMPILER_TARGET);
 	if (compiledPS == nullptr) {
-		MessageBox( nullptr, L"Error compiling pixel shader", L"Shader Initialization Error", MB_OK );
+		MessageBox(nullptr, L"Error compiling pixel shader", L"Shader Initialization Error", MB_OK);
 		return false;
 	}
 
@@ -319,7 +319,7 @@ bool Renderer::InitializeShaders() {
 	if (FAILED(hr)) {
 		if (compiledVS) compiledVS->Release();
 		if (compiledPS) compiledPS->Release();
-		MessageBox( nullptr, L"Error creating pixel shader", L"Shader Initialization Error", MB_OK );
+		MessageBox(nullptr, L"Error creating pixel shader", L"Shader Initialization Error", MB_OK);
 		return false;
 	}
 
@@ -503,10 +503,10 @@ bool Renderer::LoadTestObject() {
 		{ DirectX::XMFLOAT3(-0.5f, -0.5f,  0.5f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 1
 		{ DirectX::XMFLOAT3(-0.5f,  0.5f, -0.5f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 2
 		{ DirectX::XMFLOAT3(-0.5f,  0.5f,  0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 3
-		{ DirectX::XMFLOAT3( 0.5f, -0.5f, -0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 4
-		{ DirectX::XMFLOAT3( 0.5f, -0.5f,  0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 5
-		{ DirectX::XMFLOAT3( 0.5f,  0.5f,  -0.5f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 6
-		{ DirectX::XMFLOAT3( 0.5f,  0.5f,  0.5f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 7
+		{ DirectX::XMFLOAT3(0.5f, -0.5f, -0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 4
+		{ DirectX::XMFLOAT3(0.5f, -0.5f,  0.5f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 5
+		{ DirectX::XMFLOAT3(0.5f,  0.5f, -0.5f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 6
+		{ DirectX::XMFLOAT3(0.5f,  0.5f,  0.5f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 7
 	};
 
 	// Define indices
