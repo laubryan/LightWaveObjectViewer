@@ -416,18 +416,16 @@ bool Renderer::InitializeView() {
 	DirectX::XMVECTOR eyePt = DirectX::XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f);
 	DirectX::XMVECTOR lookAt = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	DirectX::XMVECTOR upVec = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	DirectX::XMMATRIX lookAtMatrix = DirectX::XMMatrixLookAtRH(eyePt, lookAt, upVec);
-	DirectX::XMMATRIX lookAtMatrixTranspose = DirectX::XMMatrixTranspose(lookAtMatrix);
-	DirectX::XMStoreFloat4x4(&_constantBufferData.view, lookAtMatrixTranspose);
+	DirectX::XMMATRIX lookAtMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtRH(eyePt, lookAt, upVec));
+	DirectX::XMStoreFloat4x4(&_constantBufferData.view, lookAtMatrix);
 
 	// Set up projection matrix
-	float aspectRatio = ((float)_windowWidth / (float)_windowHeight);
-	float fovAngleY = 70.0f * DirectX::XM_PI / 180.0f;
+	float aspectRatio = (float)_windowWidth / (float)_windowHeight;
+	float fovAngleY = 45.0f * (DirectX::XM_PI / 180.0f);
 	float nearPlane = 0.01f;
 	float farPlane = 500.0f;
-	DirectX::XMMATRIX perspectiveMatrix = DirectX::XMMatrixPerspectiveFovRH(fovAngleY, aspectRatio, nearPlane, farPlane);
-	DirectX::XMMATRIX perspectiveMatrixTranspose = DirectX::XMMatrixTranspose(perspectiveMatrix);
-	DirectX::XMStoreFloat4x4(&_constantBufferData.projection, perspectiveMatrixTranspose);
+	DirectX::XMMATRIX perspectiveMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixPerspectiveFovRH(fovAngleY, aspectRatio, nearPlane, farPlane));
+	DirectX::XMStoreFloat4x4(&_constantBufferData.projection, perspectiveMatrix);
 
 	// Define constant buffer elements to feed transformations to shader
 	CD3D11_BUFFER_DESC constantBufferDesc(sizeof(_constantBufferData), D3D11_BIND_CONSTANT_BUFFER);
@@ -449,8 +447,8 @@ bool Renderer::InitializeViewport() {
 
 	// Initialize viewport parameters
 	ZeroMemory(&_viewport, sizeof(D3D11_VIEWPORT));
-	_viewport.Height = (float)_windowWidth;
-	_viewport.Width = (float)_windowHeight;
+	_viewport.Width = (float)_windowWidth;
+	_viewport.Height = (float)_windowHeight;
 	_viewport.MinDepth = 0;
 	_viewport.MaxDepth = 1;
 
@@ -506,11 +504,11 @@ bool Renderer::LoadTestObject() {
 		{ DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3(-0.58f, -0.58f, -0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 0
 		{ DirectX::XMFLOAT3(-0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3(-0.58f, -0.58f,  0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 1
 		{ DirectX::XMFLOAT3(-0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3(-0.58f,  0.58f, -0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 2
-		{ DirectX::XMFLOAT3(-0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3(-0.58f,  0.58f,  0.58f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 3
-		{ DirectX::XMFLOAT3( 0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3( 0.58f, -0.58f, -0.58f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 4
-		{ DirectX::XMFLOAT3( 0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3( 0.58f, -0.58f,  0.58f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 5
-		{ DirectX::XMFLOAT3( 0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3( 0.58f,  0.58f, -0.58f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 6
-		{ DirectX::XMFLOAT3( 0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3( 0.58f,  0.58f,  0.58f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 7
+		{ DirectX::XMFLOAT3(-0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3(-0.58f,  0.58f,  0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 3
+		{ DirectX::XMFLOAT3( 0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3( 0.58f, -0.58f, -0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 4
+		{ DirectX::XMFLOAT3( 0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3( 0.58f, -0.58f,  0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 5
+		{ DirectX::XMFLOAT3( 0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3( 0.58f,  0.58f, -0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 6
+		{ DirectX::XMFLOAT3( 0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3( 0.58f,  0.58f,  0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 7
 	};
 
 	// Define indices
