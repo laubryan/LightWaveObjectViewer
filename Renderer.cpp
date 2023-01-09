@@ -13,6 +13,9 @@ bool Renderer::Initialize(HWND outputWindow, UINT width, UINT height) {
 	// Direct3D
 	if (!InitializeDirect3D()) return false;
 
+	// Lights
+	if (!InitializeLights()) return false;
+
 	// Success
 	return true;
 }
@@ -52,6 +55,7 @@ void Renderer::Render() {
 
 	// Update constant buffers
 	_deviceContext->UpdateSubresource(_vsConstantBuffer, 0, nullptr, &_vsConstantBufferData, 0, 0);
+	_deviceContext->UpdateSubresource(_psConstantBuffer, 0, nullptr, &_psConstantBufferData, 0, 0);
 
 	// Bind render target (Output-Merger stage)
 	_deviceContext->OMSetRenderTargets(1, &_renderTargetView, nullptr);
@@ -62,7 +66,7 @@ void Renderer::Render() {
 
 	// Set constant buffers
 	_deviceContext->VSSetConstantBuffers(0, 1, &_vsConstantBuffer); // Register b0
-	_deviceContext->VSSetConstantBuffers(1, 1, &_psConstantBuffer); // Register b1
+	_deviceContext->PSSetConstantBuffers(1, 1, &_psConstantBuffer); // Register b1
 
 	// Set vertex shader stage
 	_deviceContext->VSSetShader(_vertexShader, nullptr, 0);
@@ -119,13 +123,16 @@ void Renderer::Update() {
 
 	// Calculate object rotation
 	float rotation = elapsedTime / 1000.0f;
-	_objectRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation, rotation, 0);
+	DirectX::XMMATRIX objectRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation, rotation, 0);
+	DirectX::XMMATRIX worldMatrix = _objectTranslation * objectRotation;
+	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.world, worldMatrix);
 
-	// Update world matrix
-	_worldMatrix = DirectX::XMMatrixTranspose(_objectTranslation * _objectRotation);
+	// Update world-view
+	DirectX::XMMATRIX worldViewMatrix = worldMatrix * _viewMatrix;
+	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.worldView, worldViewMatrix);
 
 	// Update world-view-projection
-	DirectX::XMMATRIX worldViewProjectionMatrix = _projectionMatrix * _viewMatrix * _worldMatrix;
+	DirectX::XMMATRIX worldViewProjectionMatrix = _projectionMatrix * _viewMatrix * worldMatrix;
 	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.worldViewProj, worldViewProjectionMatrix);
 }
 
@@ -457,14 +464,8 @@ bool Renderer::InitializeBuffers() {
 /// <returns></returns>
 bool Renderer::InitializeObjectTransforms() {
 
-	// Store light position
-	DirectX::XMMATRIX lightPositionMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixTranslation(10.0f, 8.0f, -10.0f));
-	DirectX::XMStoreFloat4x4(&_psConstantBufferData.lightPosition, lightPositionMatrix);
-
-	// Calculate and store world matrix (for object)
+	// Initialize object translation
 	_objectTranslation = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
-	_objectRotation = DirectX::XMMatrixIdentity();
-	_worldMatrix = DirectX::XMMatrixTranspose(_objectTranslation * _objectRotation);
 
 	// Calculate view matrix
 	DirectX::XMVECTOR eyePt = DirectX::XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f);
@@ -479,9 +480,20 @@ bool Renderer::InitializeObjectTransforms() {
 	float farPlane = 500.0f;
 	_projectionMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixPerspectiveFovRH(fovAngleY, aspectRatio, nearPlane, farPlane));
 
-	// Calculate and store world-view-projection matrix
-	DirectX::XMMATRIX worldViewProjectionMatrix = _projectionMatrix * _viewMatrix * _worldMatrix;
-	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.worldViewProj, worldViewProjectionMatrix);
+	return true;
+}
+
+/// <summary>
+/// Initialize lights
+/// </summary>
+/// <returns></returns>
+bool Renderer::InitializeLights() {
+
+	// Store ambient light
+	_psConstantBufferData.ambient = { 0.1f, 0.1f, 0.1f, 1.0f };
+
+	// Store light position
+	_psConstantBufferData.lightPosition = { 10.0f, 0.0f, 10.0f };
 
 	return true;
 }
@@ -529,35 +541,71 @@ bool Renderer::LoadTestObject() {
 
 	// Define object vertices in list
 	_vertices = {
-		{ DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3(-0.58f, -0.58f, -0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 0
-		{ DirectX::XMFLOAT3(-0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3(-0.58f, -0.58f,  0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 1
-		{ DirectX::XMFLOAT3(-0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3(-0.58f,  0.58f, -0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 2
-		{ DirectX::XMFLOAT3(-0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3(-0.58f,  0.58f,  0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 3
-		{ DirectX::XMFLOAT3( 0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3( 0.58f, -0.58f, -0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 4
-		{ DirectX::XMFLOAT3( 0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3( 0.58f, -0.58f,  0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 5
-		{ DirectX::XMFLOAT3( 0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3( 0.58f,  0.58f, -0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 6
-		{ DirectX::XMFLOAT3( 0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3( 0.58f,  0.58f,  0.58f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 7
+
+		// Left
+		{ DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3(-1.0f,  0.0f,  0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 0
+		{ DirectX::XMFLOAT3(-0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3(-1.0f,  0.0f,  0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 1
+		{ DirectX::XMFLOAT3(-0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3(-1.0f,  0.0f,  0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 2
+		{ DirectX::XMFLOAT3(-0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3(-1.0f,  0.0f,  0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f) }, // 3
+
+		// Right
+		{ DirectX::XMFLOAT3( 0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3( 1.0f,  0.0f,  0.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 4
+		{ DirectX::XMFLOAT3( 0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3( 1.0f,  0.0f,  0.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 5
+		{ DirectX::XMFLOAT3( 0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3( 1.0f,  0.0f,  0.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 6
+		{ DirectX::XMFLOAT3( 0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3( 1.0f,  0.0f,  0.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f) }, // 7
+
+		// Bottom
+		{ DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3( 0.0f, -1.0f,  0.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 8
+		{ DirectX::XMFLOAT3(-0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3( 0.0f, -1.0f,  0.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 9
+		{ DirectX::XMFLOAT3( 0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3( 0.0f, -1.0f,  0.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 10
+		{ DirectX::XMFLOAT3( 0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3( 0.0f, -1.0f,  0.0f), DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f) }, // 11
+
+		// Top
+		{ DirectX::XMFLOAT3(-0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3( 0.0f,  1.0f,  0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) }, // 12
+		{ DirectX::XMFLOAT3( 0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3( 0.0f,  1.0f,  0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) }, // 13
+		{ DirectX::XMFLOAT3( 0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3( 0.0f,  1.0f,  0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) }, // 14
+		{ DirectX::XMFLOAT3(-0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3( 0.0f,  1.0f,  0.0f), DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f) }, // 15
+
+		// Front
+		{ DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3( 0.0f,  0.0f, -1.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f) }, // 16
+		{ DirectX::XMFLOAT3( 0.5f, -0.5f, -0.5f), DirectX::XMFLOAT3( 0.0f,  0.0f, -1.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f) }, // 17
+		{ DirectX::XMFLOAT3( 0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3( 0.0f,  0.0f, -1.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f) }, // 18
+		{ DirectX::XMFLOAT3(-0.5f,  0.5f, -0.5f), DirectX::XMFLOAT3( 0.0f,  0.0f, -1.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f) }, // 19
+
+		// Back
+		{ DirectX::XMFLOAT3(-0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3( 0.0f,  0.0f,  1.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f) }, // 20
+		{ DirectX::XMFLOAT3(-0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3( 0.0f,  0.0f,  1.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f) }, // 21
+		{ DirectX::XMFLOAT3( 0.5f,  0.5f,  0.5f), DirectX::XMFLOAT3( 0.0f,  0.0f,  1.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f) }, // 22
+		{ DirectX::XMFLOAT3( 0.5f, -0.5f,  0.5f), DirectX::XMFLOAT3( 0.0f,  0.0f,  1.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f) }, // 23
 	};
 
 	// Define indices
 	_indices = {
+
+		// Left
 		0, 2, 1,
 		1, 2, 3,
+
+		// Right
 		4, 5, 6,
 		5, 7, 6,
-		0, 1, 5,
-		0, 5, 4,
-		2, 6, 7,
-		2, 7, 3,
-		0, 4, 6,
-		0, 6, 2,
-		1, 3, 7,
-		1, 7, 5,
-	};
 
-	// Set initial transformations
-	_objectTranslation = DirectX::XMMatrixTranslation(0, 0, 0);
-	_objectRotation = DirectX::XMMatrixIdentity();
+		// Bottom
+		8, 9, 10,
+		8, 10, 11,
+
+		// Top
+		12, 13, 14,
+		12, 14, 15,
+
+		// Front
+		16, 17, 18,
+		16, 18, 19,
+
+		// Back
+		20, 21, 22,
+		20, 22, 23,
+	};
 
 	// Success
 	return true;

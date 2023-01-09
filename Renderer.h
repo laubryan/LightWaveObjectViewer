@@ -32,6 +32,7 @@ private:
 
 	bool InitializeBuffers();
 	bool InitializeObjectTransforms();
+	bool InitializeLights();
 
 	ID3DBlob* CompileShaderFromFile(LPCWSTR shaderPathname, LPCSTR compilerTarget);
 
@@ -79,8 +80,6 @@ private:
 
 	// Transformations
 	DirectX::XMMATRIX _objectTranslation;
-	DirectX::XMMATRIX _objectRotation;
-	DirectX::XMMATRIX _worldMatrix;
 	DirectX::XMMATRIX _viewMatrix;
 	DirectX::XMMATRIX _projectionMatrix;
 
