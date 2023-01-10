@@ -10,7 +10,7 @@ something more complicated like Unity or some conversion app. Thus, the LightWav
 
 ![LightWave Object Viewer window](https://github.com/laubryan/LightWaveObjectViewer/blob/187a66ca4ecc103661771be7c60d40bc36f634b8/Screenshots/Main%20Screenshot.jpg?raw=true)
 
-LightWave Object Viewer is a Windows application created in Visual Studio.
+LightWave Object Viewer is a Windows application using Direct3D 11, created in Visual Studio.
 
 
 ## Usage
