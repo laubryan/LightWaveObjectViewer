@@ -38,7 +38,6 @@ private:
 
 	ID3DBlob* CompileShaderFromFile(LPCWSTR shaderPathname, LPCSTR compilerTarget);
 
-	bool LoadTestObject();
 	bool TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj);
 
 	// Private data
