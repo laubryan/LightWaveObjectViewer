@@ -5,7 +5,7 @@
 /// </summary>
 /// <returns>Description</returns>
 string Polygons::getDescription() {
-	return "Polygons: " + to_string(polygons_.size());
+	return "Polygons: " + to_string(_polygons.size());
 }
 
 /// <summary>
@@ -17,7 +17,7 @@ void Polygons::parse(char rawBuffer[], LWO_CHUNK_HEADER header) {
 	unsigned offset = LWO_CHUNK_DATA_OFFSET;
 	string polygonType = CONVERT_BYTES_TO_STRING(rawBuffer + offset, 4);
 	if (polygonType == "FACE") {
-		polygons_ = parsePolygons(rawBuffer + offset, header.length);
+		_polygons = parsePolygons(rawBuffer + offset, header.length);
 	}
 }
 
@@ -26,7 +26,7 @@ void Polygons::parse(char rawBuffer[], LWO_CHUNK_HEADER header) {
 /// </summary>
 /// <returns>Vector of polygons</returns>
 vector<POLYGON>& Polygons::getPolygons() {
-	return polygons_;
+	return _polygons;
 }
 
 /// <summary>
