@@ -8,7 +8,7 @@ LightWave used to be much more popular than it is today, but I still have a smal
 of object files from that era that I wanted to quickly view without importing them into 
 something more complicated like Unity or some conversion app. Thus, the LightWave Object Viewer was born.
 
-![LightWave Object Viewer window](https://github.com/laubryan/LightWaveObjectViewer/blob/Main Screenshot.jpg?raw=true)
+![LightWave Object Viewer window](https://github.com/laubryan/LightWaveObjectViewer/blob/187a66ca4ecc103661771be7c60d40bc36f634b8/Screenshots/Main%20Screenshot.jpg?raw=true)
 
 LightWave Object Viewer is a Windows application created in Visual Studio.
 
@@ -24,6 +24,8 @@ The tool still needs more work, but I'll improve it slowly over time.
 
 - Only vertex and polygon information is extracted. Everything else is skipped.
 - Polygons with more than 4 vertices are not loaded for now.
+- The tool works on my small collection of object files, but there may be issues with other files that I haven't discovered yet.
+- Only the LWO2 object file version is supported. LWO3 objects won't load for now.
 
 ## License
 
