@@ -32,9 +32,10 @@ The tool still needs more work, but I'll improve it slowly over time.
 As I mentioned, the tool needs a bit of work. Some improvements I'd like to make next:
 
 - Handle n-sided polygons.
-- Apply LightWave surface attributes (e.g. color, reflectivity, etc).
+- Apply LightWave surface attributes (e.g. color, reflectivity, etc) and improve the shader.
 - Allow user to interact with view.
 - Additional UI to tweak the display.
+- Some code refactoring.
 
 ## License
 
