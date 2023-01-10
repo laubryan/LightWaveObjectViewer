@@ -6,7 +6,7 @@
 /// <param name="chunk"></param>
 void Layer::addChunk(unique_ptr<Chunk> chunk) {
 
-	chunks_.push_back(move(chunk));
+	_chunks.push_back(move(chunk));
 }
 
 /// <summary>
@@ -18,12 +18,12 @@ void Layer::addChunk(unique_ptr<Chunk> chunk) {
 bool Layer::getChunk(Chunk& chunk, unsigned chunkIndex) {
 
 	// Validate index
-	if (chunkIndex >= chunks_.size()) {
+	if (chunkIndex >= _chunks.size()) {
 		return false;
 	}
 
 	// Return chunk reference
-	chunk = *chunks_[chunkIndex].get();
+	chunk = *_chunks[chunkIndex].get();
 	return true;
 }
 
@@ -36,7 +36,7 @@ bool Layer::getChunk(Chunk& chunk, unsigned chunkIndex) {
 Chunk* Layer::getChunk(ChunkTag tag) {
 
 	// Search for the matching tag
-	for (auto&& prospective : chunks_) {
+	for (auto&& prospective : _chunks) {
 
 		// Return first match
 		ChunkTag prospectiveTag = prospective->getTag();
@@ -56,7 +56,7 @@ Chunk* Layer::getChunk(ChunkTag tag) {
 /// </summary>
 /// <returns>Layer name</returns>
 string Layer::getName() {
-	return name_;
+	return _name;
 }
 
 /// <summary>
@@ -89,7 +89,7 @@ void Layer::parse(char rawBuffer[], LWO_CHUNK_HEADER header) {
 	}
 
 	// Save some fields to instance
-	name_ = cookedChunk.name;
+	_name = cookedChunk.name;
 }
 
 /// <summary>
@@ -97,5 +97,5 @@ void Layer::parse(char rawBuffer[], LWO_CHUNK_HEADER header) {
 /// </summary>
 /// <returns>Number of chunks stored in this layer</returns>
 size_t Layer::size() {
-	return chunks_.size();
+	return _chunks.size();
 }

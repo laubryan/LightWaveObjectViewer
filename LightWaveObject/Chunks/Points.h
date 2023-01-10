@@ -19,6 +19,6 @@ public:
 private:
 
 	// Private data
-	vector<VEC12> points_;
+	vector<VEC12> _points;
 };
 

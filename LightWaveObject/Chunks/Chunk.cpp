@@ -67,7 +67,7 @@ unique_ptr<Chunk> Chunk::create(ChunkTag chunkType) {
 /// </summary>
 /// <returns>Tag describing this chunk</returns>
 ChunkTag Chunk::getTag() {
-	return tag_;
+	return _tag;
 }
 
 /// <summary>

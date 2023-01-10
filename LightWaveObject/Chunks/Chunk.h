@@ -6,7 +6,7 @@
 class Chunk {
 public:
 	// Constructor
-	Chunk(ChunkTag tag = ChunkTag::UNKNOWN) : tag_ { tag } { }
+	Chunk(ChunkTag tag = ChunkTag::UNKNOWN) : _tag { tag } { }
 
 	// Static factory methods
 	static unique_ptr<Chunk> create(ChunkTag chunkType);
@@ -22,6 +22,6 @@ public:
 private:
 
 	// Private data
-	ChunkTag tag_ {};
+	ChunkTag _tag {};
 };
 

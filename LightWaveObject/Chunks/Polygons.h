@@ -21,6 +21,6 @@ private:
 	vector<POLYGON> parsePolygons(char rawBuffer[], unsigned chunkLength);
 
 	// Private data
-	vector<POLYGON> polygons_;
+	vector<POLYGON> _polygons;
 };
 

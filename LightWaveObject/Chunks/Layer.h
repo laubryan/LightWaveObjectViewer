@@ -22,7 +22,7 @@ public:
 private:
 
 	// Private data
-	vector<unique_ptr<Chunk>> chunks_;
-	string name_;
+	vector<unique_ptr<Chunk>> _chunks;
+	string _name;
 };
 

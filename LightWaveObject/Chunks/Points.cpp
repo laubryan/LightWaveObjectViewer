@@ -7,7 +7,7 @@
 /// </summary>
 /// <returns>Description</returns>
 string Points::getDescription() {
-	return "Vertices: " + to_string(points_.size());
+	return "Vertices: " + to_string(_points.size());
 }
 
 /// <summary>
@@ -15,7 +15,7 @@ string Points::getDescription() {
 /// </summary>
 /// <returns>Vector of points</returns>
 vector<VEC12>& Points::getPoints() {
-	return points_;
+	return _points;
 }
 
 /// <summary>
@@ -23,7 +23,7 @@ vector<VEC12>& Points::getPoints() {
 /// </summary>
 /// <returns></returns>
 unsigned Points::length() {
-	return points_.size();
+	return _points.size();
 }
 
 /// <summary>
@@ -39,7 +39,7 @@ void Points::parse(char rawBuffer[], LWO_CHUNK_HEADER header) {
 		VEC12 point = CONVERT_VEC12_BYTES(rawBuffer + offset);
 
 		// Store coordinate
-		points_.push_back(point);
+		_points.push_back(point);
 	}
 }
 
@@ -48,5 +48,5 @@ void Points::parse(char rawBuffer[], LWO_CHUNK_HEADER header) {
 /// </summary>
 /// <returns>Number of vertices in this chunk</returns>
 size_t Points::size() {
-	return points_.size();
+	return _points.size();
 }

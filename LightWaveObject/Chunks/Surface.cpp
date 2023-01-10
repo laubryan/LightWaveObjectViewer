@@ -31,31 +31,31 @@ void Surface::parse(char rawBuffer[], LWO_CHUNK_HEADER header) {
 		// Handle sub-chunks
 		switch (subChunkTag) {
 			case SurfaceSubChunkTag::COLR:
-				color_ = CONVERT_COL12_BYTES(rawBuffer + offset);
+				_color = CONVERT_COL12_BYTES(rawBuffer + offset);
 				offset += sizeof(COL12);
-				envIndex_ = CONVERT_VX_BYTES(rawBuffer + offset);
+				_envIndex = CONVERT_VX_BYTES(rawBuffer + offset);
 				offset += 4;
 				break;
 			case SurfaceSubChunkTag::DIFF:
-				diff_ = parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+				_diff = parseFloatVxValues(rawBuffer, offset, unhandledIndex);
 				break;
 			case SurfaceSubChunkTag::LUMI:
-				lumi_= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+				_lumi= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
 				break;
 			case SurfaceSubChunkTag::SPEC:
-				spec_= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+				_spec= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
 				break;
 			case SurfaceSubChunkTag::REFL:
-				refl_= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+				_refl= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
 				break;
 			case SurfaceSubChunkTag::TRAN:
-				tran_= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+				_tran= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
 				break;
 			case SurfaceSubChunkTag::TRNL:
-				trnl_= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+				_trnl= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
 				break;
 			case SurfaceSubChunkTag::GLOS:
-				glossiness_ = parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+				_glossiness = parseFloatVxValues(rawBuffer, offset, unhandledIndex);
 				break;
 			case SurfaceSubChunkTag::BLOK:
 				break;
@@ -131,7 +131,7 @@ float Surface::parseFloatVxValues(char buffer[], unsigned& offset, unsigned& vx)
 
 	// Vx value
 	vx = CONVERT_VX_BYTES(buffer + offset);
-	offset += 4; // CONVERT_VX_LENGTH(envIndex_);
+	offset += 4;
 
 	return floatVal;
 }
