@@ -26,14 +26,20 @@ bool Renderer::Initialize(HWND outputWindow, UINT width, UINT height) {
 /// <returns>Load success state</returns>
 bool Renderer::LoadObject(std::string objectPathname) {
 
-	// Load test object
-	//LoadTestObject();
-
-	// Load test LightWave object
+	// Read designated object file
 	std::unique_ptr<LightWaveObject> lwObject = make_unique<LightWaveObject>();
-	lwObject->Read(objectPathname);
+	string errorReason;
+	if (!lwObject->Read(objectPathname, errorReason)) {
+		MessageBoxA(_outputWindow, errorReason.c_str(), "Error Loading Object", MB_OK);
+		return false;
+	}
+
+	// Clear current object data
+	_vertices.clear();
+	_indices.clear();
 
 	// Extract mesh data from object
+	// TODO: Refactor to separate conversion class
 	if (!TransferMeshDataFromLWO(move(lwObject))) return false;
 
 	// Buffers
@@ -100,12 +106,12 @@ void Renderer::Shutdown() {
 	_inputLayout->Release();
 
 	// Constant buffers
-	_vsConstantBuffer->Release();
-	_psConstantBuffer->Release();
+	if(_vsConstantBuffer) _vsConstantBuffer->Release();
+	if(_psConstantBuffer) _psConstantBuffer->Release();
 
 	// Object buffers
-	_vertexBuffer->Release();
-	_indexBuffer->Release();
+	if(_vertexBuffer) _vertexBuffer->Release();
+	if(_indexBuffer) _indexBuffer->Release();
 
 	// D3D resources
 	_renderTargetView->Release();
@@ -625,11 +631,14 @@ bool Renderer::LoadTestObject() {
 /// <returns>Transfer success</returns>
 bool Renderer::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj) {
 
+	bool unsupportedPolygons = false; // Polygons with unsupported number of vertices
+
 	// Validate object layers
 	size_t numLayers = obj->GetNumLayers();
 	if (numLayers == 0) return false;
 
-	// Initialize default vertex components
+	// Initialize default vertex color
+	// TODO: Integrate color from SURF chunk
 	DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Transfer LightWave vertices to temporary list
@@ -650,9 +659,9 @@ bool Renderer::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj) {
 		if (pol.numVertices == 3) {
 
 			// Store indices for triangles
-			unsigned idx1 = pol.pointIndex[2];
+			unsigned idx1 = pol.pointIndex[0];
 			unsigned idx2 = pol.pointIndex[1];
-			unsigned idx3 = pol.pointIndex[0];
+			unsigned idx3 = pol.pointIndex[2];
 			_indices.push_back(idx1);
 			_indices.push_back(idx2);
 			_indices.push_back(idx3);
@@ -669,14 +678,22 @@ bool Renderer::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj) {
 				vert1.pos.z - vert2.pos.z,
 			};
 			DirectX::XMVECTOR vec2 = {
-				vert3.pos.x - vert2.pos.x,
-				vert3.pos.y - vert2.pos.y,
-				vert3.pos.z - vert2.pos.z,
+				vert1.pos.x - vert3.pos.x,
+				vert1.pos.y - vert3.pos.y,
+				vert1.pos.z - vert3.pos.z,
 			};
 			DirectX::XMVECTOR normal = DirectX::XMVector3Cross(vec1, vec2);
 
 			// Store vertex
-			//_vertices.push_back({ vert1.pos, normal, color });
+			DirectX::XMStoreFloat3(&vert1.normal, normal);
+			DirectX::XMStoreFloat3(&vert2.normal, normal);
+			DirectX::XMStoreFloat3(&vert3.normal, normal);
+			vert1.color = color;
+			vert2.color = color;
+			vert3.color = color;
+			_vertices.push_back(vert1);
+			_vertices.push_back(vert2);
+			_vertices.push_back(vert3);
 
 		}
 		else if (pol.numVertices == 4) {
@@ -734,6 +751,16 @@ bool Renderer::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj) {
 			_vertices.push_back(vert3);
 			_vertices.push_back(vert4);
 		}
+		else {
+
+			// Polygons with more than 4 vertices are skipped (for now)
+			// TODO: Generalize algorithm to split n-sided polygons
+		}
+	}
+
+	// Display warning about unsupported polygons
+	if (unsupportedPolygons) {
+		MessageBoxA(_outputWindow, "One or more polygons had an unsupported number of vertices and were skipped.", "Unsupported Polygon Dimensions Found", MB_OK);
 	}
 
 	return true;

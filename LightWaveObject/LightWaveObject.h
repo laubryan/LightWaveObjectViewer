@@ -17,7 +17,7 @@ class LightWaveObject {
 public:
 
 	// Public methods
-	int Read(std::string lwObjectFilename);
+	bool Read(std::string lwObjectFilename, string& errorReason);
 	void displayStatistics();
 
 	// Getters
@@ -27,7 +27,7 @@ public:
 
 private:
 	// Private methods
-	std::unique_ptr<char[]> read(std::string lwObjectFilename);
+	std::unique_ptr<char[]> readFile(std::string lwObjectFilename);
 
 	LWO_CHUNK_HEADER parseChunkHeader(char rawBuffer[]);
 	LWO_FILE_HEADER parseFileHeader(char rawBuffer[]);

@@ -13,18 +13,18 @@
 /// Read and parse a LightWave object
 /// </summary>
 /// <param name="lwObjectFilename">Object filename to read</param>
-/// <returns>Result code of read operation</returns>
-int LightWaveObject::Read(string lwObjectFilename) {
+/// <returns>Read success</returns>
+bool LightWaveObject::Read(string lwObjectFilename, string& errorReason) {
 
 	unique_ptr<char[]> fileBuffer;	// Memory buffer
 
 	// Read the file into memory
-	fileBuffer = read(lwObjectFilename);
+	fileBuffer = readFile(lwObjectFilename);
 	if (fileBuffer == nullptr) {
 
 		// Couldn't read the file
-		cerr << "Couldn't read the file" << endl;
-		return EXIT_FAILURE;
+		errorReason = "Couldn't read the file";
+		return false;
 	}
 
 	// Read file header
@@ -32,14 +32,14 @@ int LightWaveObject::Read(string lwObjectFilename) {
 
 	// Not a valid LightWave object
 	if (fileHeader.form != "FORM") {
-		cerr << "File is not a valid LightWave object file" << endl;
-		return EXIT_FAILURE;
+		errorReason = "File is not a valid LightWave object file";
+		return false;
 	}
 
 	// Not a supported format
 	if (fileHeader.id != "LWO2") {
-		cerr << "LightWave object version is not supported" << endl;
-		return EXIT_FAILURE;
+		errorReason = "LightWave object version is not supported: " + fileHeader.id;
+		return false;
 	}
 
 	// Set up to read remaining chunks in file
@@ -113,7 +113,7 @@ int LightWaveObject::Read(string lwObjectFilename) {
 		_layers.push_back(move(currentLayer));
 	}
 
-	return EXIT_SUCCESS;
+	return true;
 }
 
 /// <summary>
@@ -188,7 +188,7 @@ const vector<POLYGON>& LightWaveObject::GetPolsByLayer(int layerIndex) {
 /// </summary>
 /// <param name="lwObjectFilename">Object filename to read</param>
 /// <returns>Smart pointer to file contents</returns>
-unique_ptr<char[]> LightWaveObject::read(std::string lwObjectFilename) {
+unique_ptr<char[]> LightWaveObject::readFile(std::string lwObjectFilename) {
 
 	unique_ptr<char[]> fileBuffer = nullptr;	// Memory buffer
 	ifstream objectFile;	// File stream

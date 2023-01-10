@@ -15,12 +15,14 @@ WCHAR szWindowClass[MAX_LOADSTRING];    // the main window class name
 HWND mainWindow;						// Main window handle
 UINT WINDOW_WIDTH = 1024;
 UINT WINDOW_HEIGHT = 768;
+bool objectLoaded = false;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+void				HandleDroppedFile(HDROP dropInfo);
 
 // Renderer class
 Renderer renderer;
@@ -48,10 +50,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	if (!renderer.Initialize(mainWindow, WINDOW_WIDTH, WINDOW_HEIGHT)) return 0;
 
 	// Load sample object
-	if (!renderer.LoadObject("D:\\Projects\\Lightwave\\Test Objects\\Cube.lwo")) {
-		MessageBoxA(mainWindow, "Could not load object", "Object Load Failure", MB_OK);
-		return FALSE;
-	}
+	//if (!renderer.LoadObject("D:\\Projects\\Lightwave\\Test Objects\\Cube.lwo")) {
+	//	return FALSE;
+	//}
 
 	// Peek at initial message in queue
 	MSG msg;
@@ -74,16 +75,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		else {
 
-			// No message, so process the scene
+			// No message, so process the scene if an object is loaded
+			if (objectLoaded) {
 
-			// Update scene
-			renderer.Update();
+				// Update scene
+				renderer.Update();
 
-			// Render frame
-			renderer.Render();
+				// Render frame
+				renderer.Render();
 
-			// Present frame
-			renderer.Present();
+				// Present frame
+				renderer.Present();
+			}
 		}
 	}
 
@@ -150,6 +153,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	ShowWindow(mainWindow, nCmdShow);
 	UpdateWindow(mainWindow);
 
+	// Register window as drop target
+	DragAcceptFiles(mainWindow, TRUE);
+
 	return TRUE;
 }
 
@@ -181,6 +187,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 						return DefWindowProc(hWnd, message, wParam, lParam);
 				}
 			}
+			break;
+		case WM_DROPFILES:
+			HandleDroppedFile((HDROP)wParam);
 			break;
 		case WM_PAINT:
 			{
@@ -219,4 +228,37 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
 			break;
 	}
 	return (INT_PTR)FALSE;
+}
+
+/// <summary>
+/// Handle dropped file
+/// </summary>
+/// <param name="dropInfo"></param>
+void HandleDroppedFile(HDROP dropInfo) {
+
+	// Get number of dropped files
+	int numFiles = DragQueryFile(dropInfo, 0xFFFFFFFF, nullptr, 0);
+
+	// Get file details if there's at least one, but we're 
+	// really only interested in the first file
+	if (numFiles > 0) {
+
+		// Get filename
+		LPWSTR draggedFilename[MAX_PATH];
+		UINT numChars = DragQueryFile(dropInfo, 0, (LPWSTR)draggedFilename, MAX_PATH);
+		if (numChars != 0) {
+
+			// Convert pathname
+			char mbFilename[MAX_PATH];
+			UINT bytesWritten = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK | WC_DEFAULTCHAR, (LPWSTR)draggedFilename, -1, mbFilename, MAX_PATH, NULL, NULL);
+		
+			// Load the object file
+			string objectPathname = string((char*)mbFilename, numChars);
+			if (renderer.LoadObject(objectPathname)) {
+
+				// Object loaded
+				objectLoaded = true;
+			}
+		}
+	}
 }
