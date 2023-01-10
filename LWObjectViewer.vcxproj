@@ -150,6 +150,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="LightWaveObject\Chunks\BoundingBox.h" />
+    <ClInclude Include="LightWaveObject\Chunks\Chunk.h" />
+    <ClInclude Include="LightWaveObject\Chunks\ChunkDefinitions.h" />
+    <ClInclude Include="LightWaveObject\Chunks\Clip.h" />
+    <ClInclude Include="LightWaveObject\Chunks\Description.h" />
+    <ClInclude Include="LightWaveObject\Chunks\Envelope.h" />
+    <ClInclude Include="LightWaveObject\Chunks\Icon.h" />
+    <ClInclude Include="LightWaveObject\Chunks\Layer.h" />
+    <ClInclude Include="LightWaveObject\Chunks\Points.h" />
+    <ClInclude Include="LightWaveObject\Chunks\Polygons.h" />
+    <ClInclude Include="LightWaveObject\Chunks\PolygonTags.h" />
+    <ClInclude Include="LightWaveObject\Chunks\Surface.h" />
+    <ClInclude Include="LightWaveObject\Chunks\Tags.h" />
+    <ClInclude Include="LightWaveObject\Chunks\Text.h" />
+    <ClInclude Include="LightWaveObject\Chunks\VertexMap.h" />
+    <ClInclude Include="LightWaveObject\Chunks\VertexMapDiscontinuous.h" />
+    <ClInclude Include="LightWaveObject\Chunks\VertexMapParameter.h" />
+    <ClInclude Include="LightWaveObject\LightWaveObject.h" />
+    <ClInclude Include="LightWaveObject\LWUtils.h" />
     <ClInclude Include="LWObjectViewer.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RendererDefinitions.h" />
@@ -157,6 +176,24 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="LightWaveObject\Chunks\BoundingBox.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\Chunk.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\Clip.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\Description.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\Envelope.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\Icon.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\Layer.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\Points.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\Polygons.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\PolygonTags.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\Surface.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\Tags.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\Text.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\VertexMap.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\VertexMapDiscontinuous.cpp" />
+    <ClCompile Include="LightWaveObject\Chunks\VertexMapParameter.cpp" />
+    <ClCompile Include="LightWaveObject\LightWaveObject.cpp" />
+    <ClCompile Include="LightWaveObject\LWUtils.cpp" />
     <ClCompile Include="LWObjectViewer.cpp" />
     <ClCompile Include="Renderer.cpp" />
   </ItemGroup>

@@ -24,10 +24,17 @@ bool Renderer::Initialize(HWND outputWindow, UINT width, UINT height) {
 /// Load object
 /// </summary>
 /// <returns>Load success state</returns>
-bool Renderer::LoadObject() {
+bool Renderer::LoadObject(std::string objectPathname) {
 
 	// Load test object
-	LoadTestObject();
+	//LoadTestObject();
+
+	// Load test LightWave object
+	std::unique_ptr<LightWaveObject> lwObject = make_unique<LightWaveObject>();
+	lwObject->Read(objectPathname);
+
+	// Extract mesh data from object
+	if (!TransferMeshDataFromLWO(move(lwObject))) return false;
 
 	// Buffers
 	if (!InitializeBuffers()) return false;
@@ -490,10 +497,10 @@ bool Renderer::InitializeObjectTransforms() {
 bool Renderer::InitializeLights() {
 
 	// Store ambient light
-	_psConstantBufferData.ambient = { 0.1f, 0.1f, 0.1f, 1.0f };
+	_psConstantBufferData.ambient = { 0.2f, 0.2f, 0.2f, 1.0f };
 
 	// Store light position
-	_psConstantBufferData.lightPosition = { 10.0f, 0.0f, 10.0f };
+	_psConstantBufferData.lightPosition = DirectX::XMFLOAT3(10.0f, 0.0f, 10.0f);
 
 	return true;
 }
@@ -608,5 +615,126 @@ bool Renderer::LoadTestObject() {
 	};
 
 	// Success
+	return true;
+}
+
+/// <summary>
+/// Transfer mesh data from LightWave object to renderer
+/// </summary>
+/// <param name="obj">LightWave object</param>
+/// <returns>Transfer success</returns>
+bool Renderer::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj) {
+
+	// Validate object layers
+	size_t numLayers = obj->GetNumLayers();
+	if (numLayers == 0) return false;
+
+	// Initialize default vertex components
+	DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	// Transfer LightWave vertices to temporary list
+	vector<VERTEX> lwVertices;
+	const vector<VEC12>& points = obj->GetPointsByLayer(0);
+ 	for (auto& point : points) {
+		VERTEX vertex = { DirectX::XMFLOAT3(point.X, point.Y, point.Z) };
+		lwVertices.push_back(vertex);
+	}
+
+	// Transfer polygon indices
+	const vector<POLYGON>& pols = obj->GetPolsByLayer(0);
+	unsigned indexOffset = 0;
+	for (auto pol : pols) {
+
+		// Note that LightWave polygons have CW winding order
+		// so the vertex order must be reversed to CCW
+		if (pol.numVertices == 3) {
+
+			// Store indices for triangles
+			unsigned idx1 = pol.pointIndex[2];
+			unsigned idx2 = pol.pointIndex[1];
+			unsigned idx3 = pol.pointIndex[0];
+			_indices.push_back(idx1);
+			_indices.push_back(idx2);
+			_indices.push_back(idx3);
+
+			// Get vertices
+			VERTEX vert1 = lwVertices[idx1];
+			VERTEX vert2 = lwVertices[idx2];
+			VERTEX vert3 = lwVertices[idx3];
+
+			// Calculate vertex normal
+			DirectX::XMVECTOR vec1 = {
+				vert1.pos.x - vert2.pos.x,
+				vert1.pos.y - vert2.pos.y,
+				vert1.pos.z - vert2.pos.z,
+			};
+			DirectX::XMVECTOR vec2 = {
+				vert3.pos.x - vert2.pos.x,
+				vert3.pos.y - vert2.pos.y,
+				vert3.pos.z - vert2.pos.z,
+			};
+			DirectX::XMVECTOR normal = DirectX::XMVector3Cross(vec1, vec2);
+
+			// Store vertex
+			//_vertices.push_back({ vert1.pos, normal, color });
+
+		}
+		else if (pol.numVertices == 4) {
+
+			// Split quads into triangles
+			unsigned idx1 = pol.pointIndex[0];
+			unsigned idx2 = pol.pointIndex[1];
+			unsigned idx3 = pol.pointIndex[2];
+			unsigned idx4 = pol.pointIndex[3];
+
+			// Triangle 1
+			_indices.push_back(indexOffset + 2); // 2
+			_indices.push_back(indexOffset + 1); // 1
+			_indices.push_back(indexOffset + 0); // 0
+
+			// Triangle 2
+			_indices.push_back(indexOffset + 0); // 0
+			_indices.push_back(indexOffset + 3); // 3
+			_indices.push_back(indexOffset + 2); // 2
+
+			indexOffset += 4;
+
+			// Get vertices
+			VERTEX vert1 = lwVertices[idx1];
+			VERTEX vert2 = lwVertices[idx2];
+			VERTEX vert3 = lwVertices[idx3];
+			VERTEX vert4 = lwVertices[idx4];
+
+			// Calculate vertex normal
+			// Assuming coplanar vertices, this normal should 
+			// be the same for both triangles of the same quad
+			DirectX::XMVECTOR vec1 = {
+				vert1.pos.x - vert2.pos.x,
+				vert1.pos.y - vert2.pos.y,
+				vert1.pos.z - vert2.pos.z,
+			};
+			DirectX::XMVECTOR vec2 = {
+				vert1.pos.x - vert4.pos.x,
+				vert1.pos.y - vert4.pos.y,
+				vert1.pos.z - vert4.pos.z,
+			};
+			DirectX::XMVECTOR normal = DirectX::XMVector3Cross(vec1, vec2);
+
+			// Store vertices
+			DirectX::XMStoreFloat3(&vert1.normal, normal);
+			DirectX::XMStoreFloat3(&vert2.normal, normal);
+			DirectX::XMStoreFloat3(&vert3.normal, normal);
+			DirectX::XMStoreFloat3(&vert4.normal, normal);
+			vert1.color = color;
+			vert2.color = color;
+			vert3.color = color;
+			vert4.color = color;
+			_vertices.push_back(vert1);
+			_vertices.push_back(vert2);
+			_vertices.push_back(vert3);
+			_vertices.push_back(vert4);
+		}
+	}
+
 	return true;
 }

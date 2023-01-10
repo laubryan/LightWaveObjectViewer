@@ -48,7 +48,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	if (!renderer.Initialize(mainWindow, WINDOW_WIDTH, WINDOW_HEIGHT)) return 0;
 
 	// Load sample object
-	renderer.LoadObject();
+	if (!renderer.LoadObject("D:\\Projects\\Lightwave\\Test Objects\\Cube.lwo")) {
+		MessageBoxA(mainWindow, "Could not load object", "Object Load Failure", MB_OK);
+		return FALSE;
+	}
 
 	// Peek at initial message in queue
 	MSG msg;

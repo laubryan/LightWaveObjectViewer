@@ -13,17 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="LightWave">
+      <UniqueIdentifier>{174330d3-6544-4140-b7cf-a0d55488acc4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LWObjectViewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -33,13 +27,133 @@
     <ClInclude Include="RendererDefinitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\BoundingBox.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\Chunk.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\ChunkDefinitions.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\Clip.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\Description.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\Envelope.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\Icon.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\Layer.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\LightWaveObject.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\LWUtils.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\Points.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\Polygons.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\PolygonTags.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\Surface.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\Tags.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\Text.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\VertexMap.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\VertexMapDiscontinuous.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="LightWaveObject\Chunks\VertexMapParameter.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>LightWave</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LWObjectViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\BoundingBox.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\Chunk.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\Clip.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\Description.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\Envelope.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\Icon.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\Layer.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\LightWaveObject.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\LWUtils.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\Points.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\Polygons.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\PolygonTags.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
     <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\Surface.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\Tags.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\Text.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\VertexMap.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\VertexMapDiscontinuous.cpp">
+      <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="LightWaveObject\Chunks\VertexMapParameter.cpp">
+      <Filter>LightWave</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

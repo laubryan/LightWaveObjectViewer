@@ -5,16 +5,18 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string>
 #include <vector>
 
 #include "RendererDefinitions.h"
+#include "LightWaveObject/LightWaveObject.h"
 
 class Renderer {
 public:
 
 	// Public methods
 	bool Initialize(HWND outputWindow, UINT width, UINT height);
-	bool LoadObject();
+	bool LoadObject(std::string objectPathname);
 	void Present();
 	void Render();
 	void Shutdown();
@@ -37,6 +39,7 @@ private:
 	ID3DBlob* CompileShaderFromFile(LPCWSTR shaderPathname, LPCSTR compilerTarget);
 
 	bool LoadTestObject();
+	bool TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj);
 
 	// Private data
 	
