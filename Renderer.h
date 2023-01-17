@@ -25,7 +25,8 @@ public:
 
 private:
 
-	// Private member functdions
+	// Private member functions
+	bool InitializeDepthBuffer();
 	bool InitializeDirect3D();
 	bool InitializeDevice();
 	bool InitializeRenderTargetView();

@@ -87,11 +87,12 @@ void Renderer::Render() {
 	_deviceContext->UpdateSubresource(_psConstantBuffer, 0, nullptr, &_psConstantBufferData, 0, 0);
 
 	// Bind render target (Output-Merger stage)
-	_deviceContext->OMSetRenderTargets(1, &_renderTargetView, nullptr);
+	_deviceContext->OMSetRenderTargets(1, &_renderTargetView, _depthStencilView);
 
 	// Clear render target
 	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
 	_deviceContext->ClearRenderTargetView(_renderTargetView, clearColor);
+	_deviceContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Set constant buffers
 	_deviceContext->VSSetConstantBuffers(0, 1, &_vsConstantBuffer); // Register b0
@@ -179,6 +180,54 @@ void Renderer::Update() {
 }
 
 /// <summary>
+/// Initialize the depth buffer
+/// </summary>
+/// <returns>Initialization success</returns>
+bool Renderer::InitializeDepthBuffer() {
+
+	HRESULT hr;
+
+	// Initialize buffer description
+	D3D11_TEXTURE2D_DESC depthTextureDesc;
+	ZeroMemory(&depthTextureDesc, sizeof(depthTextureDesc));
+	depthTextureDesc.Width = _windowWidth;
+	depthTextureDesc.Height = _windowHeight;
+	depthTextureDesc.MipLevels = 1;
+	depthTextureDesc.ArraySize = 1;
+	depthTextureDesc.SampleDesc.Count = 1;
+	depthTextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+	// Create the depth stencil texture
+	ID3D11Texture2D* depthStencilTexture;
+	hr = _device->CreateTexture2D(&depthTextureDesc, NULL, &depthStencilTexture);
+
+	// Check for errors
+	if (FAILED(hr)) {
+		MessageBox(nullptr, L"Error creating depth stencil texture", L"Depth Buffer Initialization Error", MB_OK);
+		return false;
+	}
+
+	// Initialize depth stencil view description
+	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
+	depthStencilViewDesc.Format = depthTextureDesc.Format;
+	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+
+	// Create the depth stencil view
+	hr = _device->CreateDepthStencilView(depthStencilTexture, &depthStencilViewDesc, &_depthStencilView);
+	depthStencilTexture->Release();
+
+	// Check for errors
+	if (FAILED(hr)) {
+		MessageBox(nullptr, L"Error creating depth stencil view", L"Depth Buffer Initialization Error", MB_OK);
+		return false;
+	}
+
+	return true;
+}
+
+/// <summary>
 /// Initialize Direct3D device and context
 /// </summary>
 /// <returns>Initialization success</returns>
@@ -186,6 +235,9 @@ bool Renderer::InitializeDirect3D() {
 
 	// Device
 	if (!InitializeDevice()) return false;
+
+	// Depth buffer
+	if (!InitializeDepthBuffer()) return false;
 
 	// Render target view
 	if (!InitializeRenderTargetView()) return false;
