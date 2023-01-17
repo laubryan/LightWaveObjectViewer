@@ -58,6 +58,12 @@ bool Renderer::LoadObject(std::string objectPathname) {
 	// TODO: Refactor to separate conversion class
 	if (!TransferMeshDataFromLWO(move(lwObject))) return false;
 
+	// Free old buffers if required
+	if(_vertexBuffer) _vertexBuffer->Release();
+	if(_indexBuffer) _indexBuffer->Release();
+	if(_vsConstantBuffer) _vsConstantBuffer->Release();
+	if(_psConstantBuffer) _psConstantBuffer->Release();
+
 	// Buffers
 	if (!InitializeBuffers()) return false;
 
