@@ -19,16 +19,16 @@ private:
 	float parseFloatVxValues(char buffer[], unsigned& offset, unsigned& vx);
 
 	// Private data
-	COL12 _color;
-	float _diff;
-	float _lumi;
-	float _spec;
-	float _refl;
-	float _tran;
-	float _trnl;
-	float _glossiness;
-	float _sharpness;
-	float _bump;
-	unsigned _envIndex;
+	COL12 _color {};
+	float _diff {};
+	float _lumi {};
+	float _spec {};
+	float _refl {};
+	float _tran {};
+	float _trnl {};
+	float _glossiness {};
+	float _sharpness {};
+	float _bump {};
+	unsigned _envIndex {};
 };
 
