@@ -18,16 +18,21 @@ LightWave Object Viewer is a Windows application using Direct3D 11, created in V
 Compile and run the tool, and then you can simply drag and drop a LightWave object (LWO) 
 file onto the window to display it.
 
+
 ## Recent Updates
 
 - Added generalized algorithm to split n-sided polygons. Previously, polygons with more than 4 vertices were being skipped.
+- Added support for changing the view distance using the mouse wheel.
+- The camera view is now positioned a suitable distance away when an object is initially loaded.
 - Fixed an issue where some objects weren't being shaded properly due to very small vertex normals.
+
 
 ## Technical
 
 ### Overview
 
 The viewer tool was written in C++ using the Win32 API for the base application and the Direct3D 11 API for the 3D parts.
+
 
 ### Object Files
 
@@ -59,13 +64,14 @@ simply a diffuse Lambert shading model with ambient lighting, but without the sp
 Adding other components such as specular reflections and texturing should be straightforward, and I'd guess most of the 
 work will be on the file parsing side rather than D3D.
 
+
 ## Future Work
 
 Some improvements I'd like to make next, in rough priority order:
 
-- Automatically scale the view/move camera based on object size.
 - Some code refactoring.
+- Add more view interactions such as rotation
 - Handle more LightWave surface attributes (e.g. color, reflectivity, etc) and improve the shader.
-- Allow user to interact with view.
 - Additional UI to tweak the display.
 - Support LWO3 and test on a wider range of objects.
+
