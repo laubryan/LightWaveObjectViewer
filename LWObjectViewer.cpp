@@ -49,11 +49,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Initialize renderer
 	if (!renderer.Initialize(mainWindow, WINDOW_WIDTH, WINDOW_HEIGHT)) return 0;
 
-	// Load sample object
-	//if (!renderer.LoadObject("D:\\Projects\\Lightwave\\Test Objects\\Cube.lwo")) {
-	//	return FALSE;
-	//}
-
 	// Peek at initial message in queue
 	MSG msg;
 	msg.message = WM_NULL;
@@ -112,7 +107,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 	wcex.hInstance = hInstance;
 	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_LWOBJECTVIEWER));
 	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wcex.hbrBackground = (HBRUSH)(LTGRAY_BRUSH);
 	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_LWOBJECTVIEWER);
 	wcex.lpszClassName = szWindowClass;
 	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -195,7 +190,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			{
 				PAINTSTRUCT ps;
 				HDC hdc = BeginPaint(hWnd, &ps);
-				// TODO: Add any drawing code that uses hdc here...
+				// Probably best not to do anything here since 
+				// D3D will basically overwrite this area anyway
 				EndPaint(hWnd, &ps);
 			}
 			break;
