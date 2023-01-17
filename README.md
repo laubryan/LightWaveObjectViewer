@@ -9,7 +9,7 @@ but I still have a small collection of object files from that era that I wanted 
 importing them into something more complicated like Unity or some conversion app. Thus, the LightWave 
 Object Viewer was born.
 
-![LightWave Object Viewer window](https://github.com/laubryan/LightWaveObjectViewer/blob/d7e8c6f5fca593d408ac1295b6c5933de80bde98/Screenshots/screenshot-1.jpg?raw=true)
+![LightWave Object Viewer window](https://github.com/laubryan/LightWaveObjectViewer/blob/64a81faf9358cd09c55f7b6bebd80379ab438493/Screenshots/screenshot-1.jpg?raw=true)
 
 LightWave Object Viewer is a Windows application using Direct3D 11, created in Visual Studio.
 
