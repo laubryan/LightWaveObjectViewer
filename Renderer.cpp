@@ -559,7 +559,7 @@ bool Renderer::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj) {
 				vert1.pos.y - vert3.pos.y,
 				vert1.pos.z - vert3.pos.z,
 			};
-			DirectX::XMVECTOR normal = DirectX::XMVector3Cross(vec1, vec2);
+			DirectX::XMVECTOR normal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(vec1, vec2));
 
 			// Store initial triangle vertices
 			DirectX::XMStoreFloat3(&vert1.normal, normal);
