@@ -8,8 +8,8 @@
 #include <string>
 #include <vector>
 
+#include "ObjectReader.h"
 #include "RendererDefinitions.h"
-#include "LightWaveObject/LightWaveObject.h"
 
 class Renderer {
 public:
@@ -39,7 +39,6 @@ private:
 
 	ID3DBlob* CompileShaderFromFile(LPCWSTR shaderPathname, LPCSTR compilerTarget);
 	float GetObjectWidth();
-	bool TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj);
 
 	// Private data
 	

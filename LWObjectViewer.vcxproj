@@ -170,6 +170,7 @@
     <ClInclude Include="LightWaveObject\LightWaveObject.h" />
     <ClInclude Include="LightWaveObject\LWUtils.h" />
     <ClInclude Include="LWObjectViewer.h" />
+    <ClInclude Include="ObjectReader.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RendererDefinitions.h" />
     <ClInclude Include="Resource.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="LightWaveObject\LightWaveObject.cpp" />
     <ClCompile Include="LightWaveObject\LWUtils.cpp" />
     <ClCompile Include="LWObjectViewer.cpp" />
+    <ClCompile Include="ObjectReader.cpp" />
     <ClCompile Include="Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>

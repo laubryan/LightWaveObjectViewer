@@ -93,6 +93,9 @@
     <ClInclude Include="targetver.h">
       <Filter>LightWave</Filter>
     </ClInclude>
+    <ClInclude Include="ObjectReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LWObjectViewer.cpp">
@@ -154,6 +157,9 @@
     </ClCompile>
     <ClCompile Include="LightWaveObject\Chunks\VertexMapParameter.cpp">
       <Filter>LightWave</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectReader.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
