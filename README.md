@@ -4,9 +4,10 @@
 
 Tool to display LightWave 3D objects.
 
-LightWave used to be much more popular than it is today, but I still have a small collection 
-of object files from that era that I wanted to quickly view without importing them into 
-something more complicated like Unity or some conversion app. Thus, the LightWave Object Viewer was born.
+LightWave 3D is a 3D modelling and rendering application that used to be popular some time ago, 
+but I still have a small collection of object files from that era that I wanted to quickly view without 
+importing them into something more complicated like Unity or some conversion app. Thus, the LightWave 
+Object Viewer was born.
 
 ![LightWave Object Viewer window](https://github.com/laubryan/LightWaveObjectViewer/blob/d7e8c6f5fca593d408ac1295b6c5933de80bde98/Screenshots/screenshot-1.jpg?raw=true)
 
