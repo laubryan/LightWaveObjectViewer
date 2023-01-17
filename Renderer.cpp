@@ -1,6 +1,22 @@
 #include "Renderer.h"
 
 /// <summary>
+/// Adjust view distance in specified direction
+/// </summary>
+/// <param name="direction">Adjustment direction</param>
+void Renderer::AdjustViewDistance(int direction) {
+
+	float step = 0.1f;
+
+	if (direction > 0) {
+		_viewZ += step;
+	}
+	else {
+		_viewZ -= step;
+	}
+}
+
+/// <summary>
 /// Initialize renderer
 /// </summary>
 bool Renderer::Initialize(HWND outputWindow, UINT width, UINT height) {
@@ -135,10 +151,23 @@ void Renderer::Update() {
 	float elapsedTime = (float)(currentTime - _time);
 
 	// Calculate object rotation
-	float rotation = elapsedTime / 1000.0f;
+	float rotation = elapsedTime / 2000.0f;
 	DirectX::XMMATRIX objectRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation, rotation, 0);
 	DirectX::XMMATRIX worldMatrix = _objectTranslation * objectRotation;
 	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.world, worldMatrix);
+
+	// Calculate view matrix
+	DirectX::XMVECTOR eyePt = DirectX::XMVectorSet(0.0f, 0.0f, _viewZ, 0.0f);
+	DirectX::XMVECTOR lookAt = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	DirectX::XMVECTOR upVec = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	_viewMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtRH(eyePt, lookAt, upVec));
+
+	// Calculate projection matrix
+	float aspectRatio = (float)_windowWidth / (float)_windowHeight;
+	float fovAngleY = 45.0f * (DirectX::XM_PI / 180.0f);
+	float nearPlane = 0.01f;
+	float farPlane = 500.0f;
+	_projectionMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixPerspectiveFovRH(fovAngleY, aspectRatio, nearPlane, farPlane));
 
 	// Update world-view
 	DirectX::XMMATRIX worldViewMatrix = worldMatrix * _viewMatrix;
@@ -434,18 +463,11 @@ bool Renderer::InitializeObjectTransforms() {
 	// Initialize object translation
 	_objectTranslation = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 
-	// Calculate view matrix
-	DirectX::XMVECTOR eyePt = DirectX::XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f);
-	DirectX::XMVECTOR lookAt = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	DirectX::XMVECTOR upVec = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	_viewMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixLookAtRH(eyePt, lookAt, upVec));
+	// Get object dimensions
+	float objectWidth = GetObjectWidth();
 
-	// Calculate projection matrix
-	float aspectRatio = (float)_windowWidth / (float)_windowHeight;
-	float fovAngleY = 45.0f * (DirectX::XM_PI / 180.0f);
-	float nearPlane = 0.01f;
-	float farPlane = 500.0f;
-	_projectionMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixPerspectiveFovRH(fovAngleY, aspectRatio, nearPlane, farPlane));
+	// Calculate required view distance
+	_viewZ = (objectWidth / 2.0f) / tan(45) * -15;
 
 	return true;
 }
@@ -499,6 +521,31 @@ ID3DBlob* Renderer::CompileShaderFromFile(LPCWSTR shaderPathname, LPCSTR compile
 	if (compilationErrors) compilationErrors->Release();
 
 	return compiledShader;
+}
+
+/// <summary>
+/// Get width of object from vertex data
+/// </summary>
+/// <returns>Object width in units</returns>
+float Renderer::GetObjectWidth() {
+
+	// Initialize min and max dimensions
+	float minX = _vertices[0].pos.x;
+	float maxX = minX;
+
+	// Check all vertices
+	for (VERTEX& vertex : _vertices) {
+
+		// Update min and max
+		if (vertex.pos.x < minX) {
+			minX = vertex.pos.x;
+		}
+		else if (vertex.pos.x > maxX) {
+			maxX = vertex.pos.x;
+		}
+	}
+
+	return maxX - minX;
 }
 
 /// <summary>

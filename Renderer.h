@@ -15,6 +15,7 @@ class Renderer {
 public:
 
 	// Public methods
+	void AdjustViewDistance(int direction);
 	bool Initialize(HWND outputWindow, UINT width, UINT height);
 	bool LoadObject(std::string objectPathname);
 	void Present();
@@ -36,7 +37,7 @@ private:
 	bool InitializeLights();
 
 	ID3DBlob* CompileShaderFromFile(LPCWSTR shaderPathname, LPCSTR compilerTarget);
-
+	float GetObjectWidth();
 	bool TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj);
 
 	// Private data
@@ -83,6 +84,7 @@ private:
 	DirectX::XMMATRIX _objectTranslation;
 	DirectX::XMMATRIX _viewMatrix;
 	DirectX::XMMATRIX _projectionMatrix;
+	float _viewZ;
 
 	// Timer
 	ULONGLONG _time = 0;

@@ -22,7 +22,9 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-void				HandleDroppedFile(HDROP dropInfo);
+
+void	HandleDroppedFile(HDROP dropInfo);
+void	HandleMouseWheel(short wheelDelta);
 
 // Renderer class
 Renderer renderer;
@@ -186,6 +188,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 		case WM_DROPFILES:
 			HandleDroppedFile((HDROP)wParam);
 			break;
+		case WM_MOUSEWHEEL:
+			HandleMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
+			break;
 		case WM_PAINT:
 			{
 				PAINTSTRUCT ps;
@@ -257,4 +262,12 @@ void HandleDroppedFile(HDROP dropInfo) {
 			}
 		}
 	}
+}
+
+/// <summary>
+/// Handle mouse wheel scrolling
+/// </summary>
+/// <param name="wheelDelta">Scroll direction</param>
+void HandleMouseWheel(short wheelDelta) {
+	renderer.AdjustViewDistance(wheelDelta);
 }
