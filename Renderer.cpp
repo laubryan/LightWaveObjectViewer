@@ -333,52 +333,6 @@ bool Renderer::InitializeShaders() {
 }
 
 /// <summary>
-/// Initialize depth stencil
-/// </summary>
-/// <returns>Initialization success</returns>
-bool Renderer::InitializeDepthStencil() {
-
-	// Describe depth stencil
-	D3D11_TEXTURE2D_DESC depthStencilTextureDescription;
-	ZeroMemory(&depthStencilTextureDescription, sizeof(D3D11_TEXTURE2D_DESC));
-	depthStencilTextureDescription.Width = _windowWidth;
-	depthStencilTextureDescription.Height = _windowHeight;
-	depthStencilTextureDescription.MipLevels = 1;
-	depthStencilTextureDescription.ArraySize = 1;
-	depthStencilTextureDescription.SampleDesc.Count = 1;
-	depthStencilTextureDescription.SampleDesc.Quality = 0;
-	depthStencilTextureDescription.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilTextureDescription.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-
-	// Create depth stencil texture
-	ID3D11Texture2D* depthStencilTexture;
-	HRESULT hr = _device->CreateTexture2D(&depthStencilTextureDescription, nullptr, &depthStencilTexture);
-	assert(!FAILED(hr));
-
-	// Set depth stencil state
-	D3D11_DEPTH_STENCIL_DESC depthStencilDescription;
-	ZeroMemory(&depthStencilDescription, sizeof(D3D11_DEPTH_STENCIL_DESC));
-	depthStencilDescription.DepthEnable = TRUE;
-	depthStencilDescription.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilDescription.DepthFunc = D3D11_COMPARISON_LESS;
-	hr = _device->CreateDepthStencilState(&depthStencilDescription, &_depthStencilState);
-
-	// Bind the depth stencil state to the OM stage
-	_deviceContext->OMSetDepthStencilState(_depthStencilState, 1);
-
-	// Create the depth stencil
-	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDescription;
-	ZeroMemory(&depthStencilViewDescription, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
-	depthStencilViewDescription.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilViewDescription.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	depthStencilViewDescription.Texture2D.MipSlice = 0;
-	hr = _device->CreateDepthStencilView(depthStencilTexture, &depthStencilViewDescription, &_depthStencilView);
-	assert(!FAILED(hr));
-
-	return true;
-}
-
-/// <summary>
 /// Initialize viewport
 /// </summary>
 /// <returns>Initialization success</returns>
@@ -629,7 +583,7 @@ bool Renderer::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj) {
 			targetIndexOffset += 3;
 
 			// Select successive opposite vectors to form each triangle
-			for (unsigned vertexIndex = 3; vertexIndex < pol.numVertices; vertexIndex++) {
+			for (unsigned vertexIndex = 3; vertexIndex < (unsigned)pol.numVertices; vertexIndex++) {
 
 				// Get the new source vertex
 				unsigned newVertexIndex = pol.pointIndex[vertexIndex];

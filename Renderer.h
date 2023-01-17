@@ -29,7 +29,6 @@ private:
 	bool InitializeDevice();
 	bool InitializeRenderTargetView();
 	bool InitializeShaders();
-	bool InitializeDepthStencil();
 	bool InitializeViewport();
 
 	bool InitializeBuffers();
