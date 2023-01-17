@@ -22,7 +22,7 @@ file onto the window to display it.
 
 ## Recent Updates
 
-- Added generalized algorithm to split n-sided polygons. Previously, polygons with more than 4 vertices were being skipped.
+- Added support for polygons with greater than 4 sides.
 - Added support for changing the view distance using the mouse wheel.
 - The camera view is now initially positioned a suitable distance away when an object is loaded.
 
@@ -41,9 +41,9 @@ interpretation of the file format, so errors are entirely possible. I'll squash 
 of LightWave 3D objects is small and I don't have the software anymore to create new ones (hence this viewer).
 
 The file format uses a chunk-style organization, not unlike the block format found in MP3 ID3v2 files. I currently skip 
-over most chunk types but I hope to add support for more in the future.
+over most chunk types but will support more in the future.
 
-LightWave 3D uses n-sided polygons, so I've implemented a generalized algorithm to split any face with more than 3 vertices 
+LightWave 3D uses n-sided polygons, so I've implemented a generalized algorithm to split any polygon with more than 3 vertices 
 into triangle strips. The normal vector is being calculated at each vertex since LightWave doesn't include the normals as 
 part of the file.
 
@@ -69,7 +69,6 @@ work will be on the file parsing side rather than D3D.
 
 Some improvements I'd like to make next, in rough priority order:
 
-- Some code refactoring.
 - Add more view interactions such as rotation.
 - Handle more LightWave surface attributes (e.g. color, reflectivity, etc) and improve the shader.
 - Additional UI to tweak the display.
