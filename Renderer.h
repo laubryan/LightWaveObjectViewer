@@ -21,6 +21,7 @@ public:
 	void Present();
 	void Render();
 	void Shutdown();
+	void Tumble(bool tumble);
 	void Update();
 
 private:
@@ -49,25 +50,25 @@ private:
 	ID3D11RenderTargetView* _renderTargetView;	// Render target view
 
 	// Depth stencil
-	ID3D11DepthStencilView* _depthStencilView;
-	ID3D11DepthStencilState* _depthStencilState;
+	ID3D11DepthStencilView* _depthStencilView {};
+	ID3D11DepthStencilState* _depthStencilState {};
 
 	// Shaders
-	ID3D11VertexShader* _vertexShader;
-	ID3D11PixelShader* _pixelShader;
-	ID3D11InputLayout* _inputLayout;
+	ID3D11VertexShader* _vertexShader {};
+	ID3D11PixelShader* _pixelShader {};
+	ID3D11InputLayout* _inputLayout {};
 
 	// Buffers
-	ID3D11Buffer* _vertexBuffer;			// Object vertex buffer
-	ID3D11Buffer* _indexBuffer;				// Object index buffer
+	ID3D11Buffer* _vertexBuffer {};			// Object vertex buffer
+	ID3D11Buffer* _indexBuffer {};			// Object index buffer
 
 	// Vertex shader constant buffer
-	ID3D11Buffer* _vsConstantBuffer;					
-	CONSTANT_BUFFER_VS _vsConstantBufferData;
+	ID3D11Buffer* _vsConstantBuffer {};					
+	CONSTANT_BUFFER_VS _vsConstantBufferData {};
 
 	// Pixel shader constant buffer
-	ID3D11Buffer* _psConstantBuffer;					
-	CONSTANT_BUFFER_PS _psConstantBufferData;
+	ID3D11Buffer* _psConstantBuffer {};					
+	CONSTANT_BUFFER_PS _psConstantBufferData {};
 
 	// Window
 	D3D11_VIEWPORT _viewport;
@@ -81,10 +82,13 @@ private:
 	std::vector<WORD> _indices;
 
 	// Transformations
-	DirectX::XMMATRIX _objectTranslation;
+	DirectX::XMMATRIX _modelMatrix;
 	DirectX::XMMATRIX _viewMatrix;
 	DirectX::XMMATRIX _projectionMatrix;
 	float _viewZ;
+
+	// State
+	bool _tumble {true};
 
 	// Timer
 	ULONGLONG _time = 0;

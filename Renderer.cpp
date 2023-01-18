@@ -140,6 +140,15 @@ void Renderer::Shutdown() {
 }
 
 /// <summary>
+/// Tumble model
+/// </summary>
+/// <param name="tumble">Tumble state</param>
+void Renderer::Tumble(bool tumble) {
+	_tumble = tumble;
+}
+
+
+/// <summary>
 /// Update the scene
 /// </summary>
 void Renderer::Update() {
@@ -154,10 +163,19 @@ void Renderer::Update() {
 	float elapsedTime = (float)(currentTime - _time);
 
 	// Calculate object rotation
-	float rotation = elapsedTime / 2000.0f;
-	DirectX::XMMATRIX objectRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation, rotation, 0);
-	DirectX::XMMATRIX worldMatrix = _objectTranslation * objectRotation;
-	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.world, worldMatrix);
+	if (_tumble) {
+
+		// Translate
+		DirectX::XMMATRIX objectTranslation = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+
+		// Rotate
+		float rotation = elapsedTime / 2000.0f;
+		DirectX::XMMATRIX objectRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation, rotation, 0);
+
+		// Update model matrix in vertex shader
+		_modelMatrix = objectTranslation * objectRotation;
+		DirectX::XMStoreFloat4x4(&_vsConstantBufferData.world, _modelMatrix);
+	}
 
 	// Calculate view matrix
 	DirectX::XMVECTOR eyePt = DirectX::XMVectorSet(0.0f, 0.0f, _viewZ, 0.0f);
@@ -173,11 +191,11 @@ void Renderer::Update() {
 	_projectionMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixPerspectiveFovRH(fovAngleY, aspectRatio, nearPlane, farPlane));
 
 	// Update world-view
-	DirectX::XMMATRIX worldViewMatrix = worldMatrix * _viewMatrix;
+	DirectX::XMMATRIX worldViewMatrix = _modelMatrix * _viewMatrix;
 	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.worldView, worldViewMatrix);
 
 	// Update world-view-projection
-	DirectX::XMMATRIX worldViewProjectionMatrix = _projectionMatrix * _viewMatrix * worldMatrix;
+	DirectX::XMMATRIX worldViewProjectionMatrix = _projectionMatrix * _viewMatrix * _modelMatrix;
 	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.worldViewProj, worldViewProjectionMatrix);
 }
 
@@ -515,7 +533,7 @@ bool Renderer::InitializeBuffers() {
 bool Renderer::InitializeObjectTransforms() {
 
 	// Initialize object translation
-	_objectTranslation = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	_modelMatrix = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 
 	// Get object dimensions
 	float objectWidth = GetObjectWidth();
@@ -601,4 +619,3 @@ float Renderer::GetObjectWidth() {
 
 	return maxX - minX;
 }
-
