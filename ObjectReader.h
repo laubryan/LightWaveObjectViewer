@@ -1,6 +1,7 @@
 #pragma once
 
 #include <DirectXMath.h>
+#include <filesystem>
 #include <windows.h>
 
 #include "LightWaveObject/LightWaveObject.h"

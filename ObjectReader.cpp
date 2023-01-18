@@ -14,9 +14,16 @@ bool ObjectReader::ReadObjectFile(string objectPathname, string& errorReason) {
 	_vertices.clear();
 	_indices.clear();
 
+	// Verify that the file exists
+	if (!std::filesystem::exists(objectPathname)) {
+		errorReason = "The file does not exist";
+		return false;
+	}
+
 	// Read designated object file
 	std::unique_ptr<LightWaveObject> lwObject = make_unique<LightWaveObject>();
 	if (!lwObject->Read(objectPathname, errorReason)) {
+		errorReason = "The file could not be read";
 		return false;
 	}
 
