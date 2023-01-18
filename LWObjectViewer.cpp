@@ -13,9 +13,17 @@ HINSTANCE hInst;                        // current instance
 WCHAR szTitle[MAX_LOADSTRING];          // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];    // the main window class name
 HWND mainWindow;						// Main window handle
-UINT WINDOW_WIDTH = 1024;
-UINT WINDOW_HEIGHT = 768;
+HWND renderWindow;						// Render output window handle
+
+// Definitions
+UINT WINDOW_WIDTH = 1300;
+UINT WINDOW_HEIGHT = 900;
+UINT RENDER_WINDOW_WIDTH = 1024;
+UINT RENDER_WINDOW_HEIGHT = 768;
+
+// States
 bool objectLoaded = false;
+bool tumbling = true;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -23,6 +31,10 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
+// Initialization functions
+void	CreateMainWindowControls();
+
+// Event handlers
 void	HandleDroppedFile(HDROP dropInfo);
 void	HandleMouseWheel(short wheelDelta);
 
@@ -49,7 +61,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LWOBJECTVIEWER));
 
 	// Initialize renderer
-	if (!renderer.Initialize(mainWindow, WINDOW_WIDTH, WINDOW_HEIGHT)) return 0;
+	if (!renderer.Initialize(renderWindow, RENDER_WINDOW_WIDTH, RENDER_WINDOW_HEIGHT)) return 0;
 
 	// Peek at initial message in queue
 	MSG msg;
@@ -153,6 +165,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	// Register window as drop target
 	DragAcceptFiles(mainWindow, TRUE);
 
+	// Populate main window controls
+	CreateMainWindowControls();
+
 	return TRUE;
 }
 
@@ -176,6 +191,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 				switch (wmId) {
 					case IDM_ABOUT:
 						DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+						break;
+					case IDC_ROTATE:
+						tumbling = !tumbling;
+						renderer.Tumble(tumbling);
 						break;
 					case IDM_EXIT:
 						DestroyWindow(hWnd);
@@ -229,6 +248,58 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
 			break;
 	}
 	return (INT_PTR)FALSE;
+}
+
+/// <summary>
+/// Create main window button
+/// </summary>
+/// <param name="x">X coordinate</param>
+/// <param name="y">Y coordinate</param>
+/// <param name="text">Button text</param>
+/// <param name="id">Button ID</param>
+HWND CreateButton(int x, int y, std::string text, UINT id) {
+
+	// Convert button text
+	std::wstring buttonText = std::wstring(text.begin(), text.end());
+
+	// Create button as child of main window
+	return CreateWindowW(
+		L"BUTTON",
+		buttonText.c_str(),
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
+		x, y, 
+		150, 30,
+		mainWindow,
+		(HMENU)id,
+		(HINSTANCE)GetWindowLongPtr(mainWindow, GWLP_HINSTANCE),
+		NULL
+	);
+}
+
+/// <summary>
+/// Create main window child controls
+/// </summary>
+void CreateMainWindowControls() {
+
+	// Create child render frame
+	renderWindow = CreateWindowW(
+		L"Static",
+		NULL,
+		WS_VISIBLE | WS_CHILD,
+		10, 10, 
+		RENDER_WINDOW_WIDTH, RENDER_WINDOW_HEIGHT,
+		mainWindow,
+		NULL,
+		(HINSTANCE)GetWindowLongPtr(mainWindow, GWLP_HINSTANCE),
+		NULL
+	);
+
+	// Define margins
+	int leftMargin = 1050;
+	int topMargin = 10;
+
+	// Create rotate button
+	CreateButton(leftMargin, topMargin, "Rotate/Stop", IDC_ROTATE);
 }
 
 /// <summary>
