@@ -15,9 +15,9 @@ using namespace std;
 
 // Color
 struct COL12 {
-	float red;
-	float green;
-	float blue;
+	float r;
+	float g;
+	float b;
 };
 
 
@@ -145,13 +145,6 @@ inline float CONVERT_FLOAT_BYTES(char bytes[]) {
 // Variable-length index is either 2 or 4 bytes
 #define CONVERT_VX_LENGTH(index) unsigned(index < 0xff00 ? 2 : 4);
 
-// Convet COL12 bytes to COL12
-inline COL12 CONVERT_COL12_BYTES(char col12bytes[]) {
-	COL12 col;
-	memcpy(&col, col12bytes, 12);
-	return col;
-};
-
 // Convert little-endian float bytes to big-endian
 inline float CONVERT_LE_FLOAT(char* quadBytes) {
 
@@ -171,7 +164,16 @@ inline float CONVERT_LE_FLOAT(char* quadBytes) {
 	dstChars[3] = srcChars[0];
 
 	return dstFloat;
-}
+};
+
+// Convet COL12 bytes to COL12
+inline COL12 CONVERT_COL12_BYTES(char col12bytes[]) {
+	COL12 col;
+	col.r = CONVERT_LE_FLOAT(col12bytes);
+	col.g = CONVERT_LE_FLOAT(col12bytes + 4);
+	col.b = CONVERT_LE_FLOAT(col12bytes + 8);
+	return col;
+};
 
 // Convet VEC12 bytes to VEC12
 inline VEC12 CONVERT_VEC12_BYTES(char vec12bytes[]) {
@@ -194,15 +196,3 @@ inline string CONVERT_BYTES_TO_STRING(char rawString[], unsigned fixedSize = 0) 
 	}
 	return string(rawString, len);
 };
-
-// Convert variable length index bytes to int
-inline unsigned CONVERT_VX_BYTES(char rawBuffer[]) {
-	// Four byte index
-	if (rawBuffer[0] == 255) {
-		return CONVERT_U4_BYTES_TO_INT(rawBuffer);
-	}
-	else {
-		// Two byte index
-		return CONVERT_U2_BYTES_TO_INT(rawBuffer);
-	}
-}
