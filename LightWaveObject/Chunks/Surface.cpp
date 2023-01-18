@@ -1,12 +1,17 @@
 #include "Surface.h"
 
 /// <summary>
+/// Get surface color
+/// </summary>
+/// <returns>Color data</returns>
+COL12 Surface::getColor() {
+	return _color;
+}
+
+/// <summary>
 /// Parse the raw chunk data
 /// </summary>
 void Surface::parse(char rawBuffer[], LWO_CHUNK_HEADER header) {
-
-	// TODO: Complete the surface parser before using
-	return;
 
 	// Skip the chunk header
 	unsigned offset = LWO_CHUNK_DATA_OFFSET;
@@ -20,7 +25,7 @@ void Surface::parse(char rawBuffer[], LWO_CHUNK_HEADER header) {
 	offset = offset + CONVERT_STRING_LENGTH(source.length());
 
 	// Read sub-chunks
-	unsigned unhandledIndex = 0; // Placeholder for unhandled vx values
+	unsigned vxValue = 0; // Placeholder for unhandled vx values
 	while (offset <= header.length) {
 
 		// Read sub-chunk tag
@@ -28,110 +33,84 @@ void Surface::parse(char rawBuffer[], LWO_CHUNK_HEADER header) {
 		SurfaceSubChunkTag subChunkTag = LWUtils::convertSurfaceTagStringToEnum(subChunkTagName);
 		offset += 4;
 
+		// Read sub-chunk size
+		short subChunkSize = CONVERT_U2_BYTES_TO_INT((rawBuffer + offset));
+		offset += 2;
+
 		// Handle sub-chunks
 		switch (subChunkTag) {
-			case SurfaceSubChunkTag::COLR:
-				_color = CONVERT_COL12_BYTES(rawBuffer + offset);
-				offset += sizeof(COL12);
-				_envIndex = CONVERT_VX_BYTES(rawBuffer + offset);
-				offset += 4;
+			case SurfaceSubChunkTag::COLR: // Base color
+				LWUtils::parseCol12Value(rawBuffer + offset, offset, _color);
+				LWUtils::parseVxValues(rawBuffer + offset, offset, _envIndex);
 				break;
-			case SurfaceSubChunkTag::DIFF:
-				_diff = parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+			case SurfaceSubChunkTag::DIFF: // Diffuse
+				LWUtils::parseFloatVxValues(rawBuffer + offset, offset, _diff, vxValue);
 				break;
-			case SurfaceSubChunkTag::LUMI:
-				_lumi= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+			case SurfaceSubChunkTag::LUMI: // Luminosity
+				LWUtils::parseFloatVxValues(rawBuffer + offset, offset, _lumi, vxValue);
 				break;
-			case SurfaceSubChunkTag::SPEC:
-				_spec= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+			case SurfaceSubChunkTag::SPEC: // Specular
+				LWUtils::parseFloatVxValues(rawBuffer + offset, offset, _spec, vxValue);
 				break;
-			case SurfaceSubChunkTag::REFL:
-				_refl= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+			case SurfaceSubChunkTag::REFL: // Reflection
+				LWUtils::parseFloatVxValues(rawBuffer + offset, offset, _refl, vxValue);
 				break;
-			case SurfaceSubChunkTag::TRAN:
-				_tran= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+			case SurfaceSubChunkTag::TRAN: // Transparency
+				LWUtils::parseFloatVxValues(rawBuffer + offset, offset, _tran, vxValue);
 				break;
-			case SurfaceSubChunkTag::TRNL:
-				_trnl= parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+			case SurfaceSubChunkTag::TRNL: // Translucency
+				LWUtils::parseFloatVxValues(rawBuffer + offset, offset, _trnl, vxValue);
 				break;
-			case SurfaceSubChunkTag::GLOS:
-				_glossiness = parseFloatVxValues(rawBuffer, offset, unhandledIndex);
+			case SurfaceSubChunkTag::GLOS: // Specular glossiness
+				LWUtils::parseFloatVxValues(rawBuffer + offset, offset, _glossiness, vxValue);
 				break;
-			case SurfaceSubChunkTag::BLOK:
+			case SurfaceSubChunkTag::SMAN: // Max smoothing angle
+				LWUtils::parseFloatValue(rawBuffer + offset, offset, _maxSmoothingAngle);
 				break;
-			case SurfaceSubChunkTag::SHRP:
-				break;
-			case SurfaceSubChunkTag::BUMP:
-				break;
-			case SurfaceSubChunkTag::SIDE:
-				break;
-			case SurfaceSubChunkTag::SMAN:
-				break;
-			case SurfaceSubChunkTag::RFOP:
-				break;
-			case SurfaceSubChunkTag::RIMG:
-				break;
-			case SurfaceSubChunkTag::RSAN:
-				break;
-			case SurfaceSubChunkTag::RBLR:
-				break;
-			case SurfaceSubChunkTag::RIND:
-				break;
-			case SurfaceSubChunkTag::TROP:
-				break;
-			case SurfaceSubChunkTag::TIMG:
-				break;
-			case SurfaceSubChunkTag::TBLR:
-				break;
-			case SurfaceSubChunkTag::CLRH:
-				break;
-			case SurfaceSubChunkTag::CLRF:
-				break;
-			case SurfaceSubChunkTag::ADTR:
-				break;
-			case SurfaceSubChunkTag::GLOW:
-				break;
-			case SurfaceSubChunkTag::LINE:
-				break;
-			case SurfaceSubChunkTag::ALPH:
-				break;
-			case SurfaceSubChunkTag::VCOL:
-				break;
+			//case SurfaceSubChunkTag::BLOK:
+			//	break;
+			//case SurfaceSubChunkTag::SHRP:
+			//	break;
+			//case SurfaceSubChunkTag::BUMP:
+			//	break;
+			//case SurfaceSubChunkTag::SIDE:
+			//	break;
+			//case SurfaceSubChunkTag::RFOP:
+			//	break;
+			//case SurfaceSubChunkTag::RIMG:
+			//	break;
+			//case SurfaceSubChunkTag::RSAN:
+			//	break;
+			//case SurfaceSubChunkTag::RBLR:
+			//	break;
+			//case SurfaceSubChunkTag::RIND:
+			//	break;
+			//case SurfaceSubChunkTag::TROP:
+			//	break;
+			//case SurfaceSubChunkTag::TIMG:
+			//	break;
+			//case SurfaceSubChunkTag::TBLR:
+			//	break;
+			//case SurfaceSubChunkTag::CLRH:
+			//	break;
+			//case SurfaceSubChunkTag::CLRF:
+			//	break;
+			//case SurfaceSubChunkTag::ADTR:
+			//	break;
+			//case SurfaceSubChunkTag::GLOW:
+			//	break;
+			//case SurfaceSubChunkTag::LINE:
+			//	break;
+			//case SurfaceSubChunkTag::ALPH:
+			//	break;
+			//case SurfaceSubChunkTag::VCOL:
+			//	break;
 			case SurfaceSubChunkTag::UNKNOWN:
+				offset += subChunkSize;
 				break;
 			default:
+				offset += subChunkSize;
 				break;
 		}
 	}
-}
-
-/// <summary>
-/// Parse float value from buffer and advance offset
-/// </summary>
-/// <param name="buffer">Raw buffer</param>
-/// <param name="offset">Current offset</param>
-/// <returns>Retrieved float</returns>
-float Surface::parseFloatValue(char buffer[], unsigned& offset) {
-	float val = CONVERT_FLOAT_BYTES(buffer + offset);
-	offset += 4;
-	return val;
-}
-
-/// <summary>
-/// Parse float and vx values from buffer and advance offset
-/// </summary>
-/// <param name="buffer">Raw buffer</param>
-/// <param name="offset">Current offset</param>
-/// <returns>Retrieved float</returns>
-float Surface::parseFloatVxValues(char buffer[], unsigned& offset, unsigned& vx) {
-
-	// Float value
-	float floatVal = CONVERT_FLOAT_BYTES(buffer + offset);
-	offset += sizeof(float);
-
-	// Vx value
-	vx = CONVERT_VX_BYTES(buffer + offset);
-	offset += 4;
-
-	return floatVal;
 }

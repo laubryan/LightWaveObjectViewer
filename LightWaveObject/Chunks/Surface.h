@@ -10,17 +10,16 @@ public:
 	Surface() : Chunk(ChunkTag::SURF) { }
 
 	// Public methods
+	COL12 getColor();
 	void parse(char rawBuffer[], LWO_CHUNK_HEADER header) override;
 
 private:
 
 	// Private methods
-	float parseFloatValue(char buffer[], unsigned& offset);
-	float parseFloatVxValues(char buffer[], unsigned& offset, unsigned& vx);
 
 	// Private data
 	COL12 _color {};
-	float _diff {};
+	float _diff {1.0f};
 	float _lumi {};
 	float _spec {};
 	float _refl {};
@@ -29,6 +28,7 @@ private:
 	float _glossiness {};
 	float _sharpness {};
 	float _bump {};
+	float _maxSmoothingAngle {-1.0f};
 	unsigned _envIndex {};
 };
 
