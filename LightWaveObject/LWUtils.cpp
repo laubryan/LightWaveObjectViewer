@@ -101,6 +101,17 @@ void LWUtils::parseFloatValue(char buffer[], unsigned& offset, float& fval) {
 }
 
 /// <summary>
+/// Parse COL12 value from buffer and advance offset
+/// </summary>
+/// <param name="buffer">Raw buffer</param>
+/// <param name="offset">Current offset</param>
+/// <returns>Retrieved COL12 value</returns>
+void LWUtils::parseCol12Value(char buffer[], unsigned& offset, COL12& col) {
+	col = CONVERT_COL12_BYTES(buffer);
+	offset += sizeof(COL12);
+}
+
+/// <summary>
 /// Parse float and vx values from buffer and advance offset
 /// </summary>
 /// <param name="buffer">Raw buffer</param>
