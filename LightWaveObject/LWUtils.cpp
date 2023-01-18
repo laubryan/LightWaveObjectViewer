@@ -88,3 +88,51 @@ SurfaceSubChunkTag LWUtils::convertSurfaceTagStringToEnum(string tag) {
 
 	return SurfaceSubChunkTag::UNKNOWN;
 }
+
+/// <summary>
+/// Parse float value from buffer and advance offset
+/// </summary>
+/// <param name="buffer">Raw buffer</param>
+/// <param name="offset">Current offset</param>
+/// <returns>Retrieved float</returns>
+void LWUtils::parseFloatValue(char buffer[], unsigned& offset, float& fval) {
+	fval = CONVERT_FLOAT_BYTES(buffer);
+	offset += 4;
+}
+
+/// <summary>
+/// Parse float and vx values from buffer and advance offset
+/// </summary>
+/// <param name="buffer">Raw buffer</param>
+/// <param name="offset">Current offset</param>
+/// <returns>Retrieved unsigned int</returns>
+void LWUtils::parseFloatVxValues(char buffer[], unsigned& offset, float& fval, unsigned& vx) {
+
+	// Float value
+	fval = CONVERT_FLOAT_BYTES(buffer);
+	offset += sizeof(float);
+
+	// VX value
+	LWUtils::parseVxValues(buffer + sizeof(float), offset, vx);
+}
+
+/// <summary>
+/// Parse VX value from buffer and advance offset
+/// </summary>
+/// <param name="buffer">Raw buffer</param>
+/// <param name="offset">Current offset</param>
+/// <param name="vx"></param>
+/// <returns></returns>
+void LWUtils::parseVxValues(char buffer[], unsigned& offset, unsigned& uval) {
+
+	if (buffer[0] == 255) {
+		// Four byte index
+		uval = CONVERT_U4_BYTES_TO_INT(buffer);
+		offset += 4;
+	}
+	else {
+		// Two byte index
+		uval = CONVERT_U2_BYTES_TO_INT(buffer);
+		offset += 2;
+	}
+}
