@@ -203,7 +203,7 @@ unique_ptr<char[]> LightWaveObject::readFile(std::string lwObjectFilename) {
 		}
 
 		// Get the file size
-		size_t bufferSize = filesystem::file_size(lwObjectFilename);
+		size_t bufferSize = (size_t)filesystem::file_size(lwObjectFilename);
 
 		// Open the file for reading
 		objectFile.open(lwObjectFilename, ios::binary);
