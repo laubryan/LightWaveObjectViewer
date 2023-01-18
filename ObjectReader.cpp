@@ -65,9 +65,10 @@ std::vector<VERTEX> ObjectReader::GetVertices() {
 /// <returns>Transfer success</returns>
 bool ObjectReader::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, string& errorReason) {
 
-	unsigned unsupportedPolygons = 0; // Polygons with unsupported number of vertices
+	// Count polygons with unsupported number of vertices
+	unsigned unsupportedPolygons = 0;
 
-									  // Validate object layers
+	// Validate object layers
 	size_t numLayers = obj->GetNumLayers();
 	if (numLayers == 0) return false;
 
@@ -134,7 +135,7 @@ bool ObjectReader::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, stri
 			_indices.push_back(targetIndexOffset + 1); // 1
 			_indices.push_back(targetIndexOffset + 0); // 0
 
-													   // Set up for next triangle
+			// Set up for next triangle
 			unsigned endTargetIndex = targetIndexOffset + 0;
 			unsigned midTargetIndex = targetIndexOffset + 2;
 			targetIndexOffset += 3;
