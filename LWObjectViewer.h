@@ -2,6 +2,8 @@
 
 #include "resource.h"
 #include <shellapi.h>
+#include <windowsx.h>
+
 #include "Renderer.h"
 
 // Forward declarations of functions included in this code module:
@@ -15,6 +17,7 @@ void	CreateMainWindowControls();
 
 // Event handlers
 void	HandleDroppedFile(HDROP dropInfo);
+void	HandleMouseDragging(HWND hwnd, long x, long y);
 void	HandleMouseWheel(short wheelDelta);
 
 // Debug functions
@@ -25,6 +28,7 @@ void	PrintMessage(const wchar_t* format, ...);
 bool _objectLoaded = false;
 bool _isDragging = false;
 bool _tumbling = true;
+POINT _dragOrigin;
 
 // Renderer class
 Renderer renderer;

@@ -4,8 +4,6 @@
 #include "framework.h"
 #include "LWObjectViewer.h"
 
-#include "Renderer.h"
-
 #define MAX_LOADSTRING 100
 
 // Global Variables:
@@ -14,6 +12,7 @@ WCHAR szTitle[MAX_LOADSTRING];          // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];    // the main window class name
 HWND mainWindow;						// Main window handle
 HWND renderWindow;						// Render output window handle
+RECT renderWindowRect;					// Render output window client rect
 
 // Definitions
 UINT WINDOW_WIDTH = 1300;
@@ -65,7 +64,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		else {
 
 			// No message, so process the scene if an object is loaded
-			if (objectLoaded) {
+			if (_objectLoaded) {
 
 				// Update scene
 				renderer.Update();
@@ -148,6 +147,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	// Populate main window controls
 	CreateMainWindowControls();
 
+	// Get render window rect
+	GetClientRect(renderWindow, &renderWindowRect);
+
 	return TRUE;
 }
 
@@ -173,8 +175,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 						DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
 						break;
 					case IDC_ROTATE:
-						tumbling = !tumbling;
-						renderer.Tumble(tumbling);
+						_tumbling = !_tumbling;
+						renderer.Tumble(_tumbling);
 						break;
 					case IDM_EXIT:
 						DestroyWindow(hWnd);
@@ -186,6 +188,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			break;
 		case WM_DROPFILES:
 			HandleDroppedFile((HDROP)wParam);
+			break;
+		case WM_LBUTTONDOWN:
+			HandleMouseDragging(hWnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			break;
+		case WM_LBUTTONUP:
+			if (_isDragging) {
+				_isDragging = false;
+			}
+			break;
+		case WM_MOUSEMOVE:
+			if (_isDragging) {
+				HandleMouseDragging(hWnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			}
 			break;
 		case WM_MOUSEWHEEL:
 			HandleMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
@@ -309,9 +324,50 @@ void HandleDroppedFile(HDROP dropInfo) {
 			if (renderer.LoadObject(objectPathname)) {
 
 				// Object loaded
-				objectLoaded = true;
+				_objectLoaded = true;
 			}
 		}
+	}
+}
+
+/// <summary>
+/// Handle mouse dragging on render window
+/// </summary>
+/// <param name="x">Mouse x coordinate</param>
+/// <param name="y">Mouse y coordinate</param>
+void HandleMouseDragging(HWND hwnd, long x, long y) {
+
+	float yaw = 0;
+	float pitch = 0;
+
+	// Assemble point
+	POINT dragPoint = POINT({ x, y });
+
+	// Only accept dragging within render window
+	if (!PtInRect(&renderWindowRect, dragPoint)) return;
+
+	// Save drag origin point if dragging has just started
+	if (!_isDragging) {
+		_dragOrigin = dragPoint;
+		_isDragging = true;
+	}
+
+	// Apply rotation while dragging
+	if (_isDragging) {
+
+		// Compute drag vector
+		yaw = (float)(_dragOrigin.x - dragPoint.x);
+		pitch = (float)(_dragOrigin.y - dragPoint.y);
+
+		// Scale rotation
+		yaw *= 0.01f;
+		pitch *= 0.01f;
+
+		// Apply rotation
+		renderer.Rotate(yaw, pitch);
+
+		// Reset origin to apply incremental rotation
+		_dragOrigin = dragPoint;
 	}
 }
 

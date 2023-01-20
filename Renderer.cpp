@@ -111,6 +111,21 @@ void Renderer::Render() {
 }
 
 /// <summary>
+/// Rotate object
+/// </summary>
+/// <param name="yaw">Yaw rotation amount</param>
+/// <param name="pitch">Pitch rotation amount</param>
+void Renderer::Rotate(float yaw, float pitch) {
+
+	// Rotate
+	DirectX::XMMATRIX objectRotation = DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, 0);
+
+	// Update model matrix in vertex shader
+	_modelMatrix = _modelMatrix * objectRotation;
+	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.world, _modelMatrix);
+}
+
+/// <summary>
 /// Shut down renderer
 /// </summary>
 void Renderer::Shutdown() {
@@ -163,19 +178,19 @@ void Renderer::Update() {
 	float elapsedTime = (float)(currentTime - _time);
 
 	// Calculate object rotation
-	if (_tumble) {
+	//if (_tumble) {
 
-		// Translate
-		DirectX::XMMATRIX objectTranslation = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	//	// Translate
+	//	DirectX::XMMATRIX objectTranslation = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 
-		// Rotate
-		float rotation = elapsedTime / 2000.0f;
-		DirectX::XMMATRIX objectRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation, rotation, 0);
+	//	// Rotate
+	//	float rotation = elapsedTime / 2000.0f;
+	//	DirectX::XMMATRIX objectRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation, rotation, 0);
 
-		// Update model matrix in vertex shader
-		_modelMatrix = objectTranslation * objectRotation;
-		DirectX::XMStoreFloat4x4(&_vsConstantBufferData.world, _modelMatrix);
-	}
+	//	// Update model matrix in vertex shader
+	//	_modelMatrix = objectTranslation * objectRotation;
+	//	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.world, _modelMatrix);
+	//}
 
 	// Calculate view matrix
 	DirectX::XMVECTOR eyePt = DirectX::XMVectorSet(0.0f, 0.0f, _viewZ, 0.0f);
