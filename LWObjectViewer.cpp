@@ -357,7 +357,7 @@ void HandleMouseDragging(HWND hwnd, long x, long y) {
 
 		// Compute drag vector
 		yaw = (float)(_dragOrigin.x - dragPoint.x);
-		pitch = (float)(_dragOrigin.y - dragPoint.y);
+		pitch = -(float)(_dragOrigin.y - dragPoint.y);
 
 		// Scale rotation
 		yaw *= 0.01f;
