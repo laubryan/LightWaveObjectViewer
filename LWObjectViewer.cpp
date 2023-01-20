@@ -21,13 +21,6 @@ UINT WINDOW_HEIGHT = 900;
 UINT RENDER_WINDOW_WIDTH = 1024;
 UINT RENDER_WINDOW_HEIGHT = 768;
 
-// States
-bool objectLoaded = false;
-bool tumbling = true;
-
-// Renderer class
-Renderer renderer;
-
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
