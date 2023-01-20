@@ -329,3 +329,24 @@ void HandleDroppedFile(HDROP dropInfo) {
 void HandleMouseWheel(short wheelDelta) {
 	renderer.AdjustViewDistance(wheelDelta);
 }
+
+/// <summary>
+/// Print debug message
+/// </summary>
+/// <param name="format">Format string</param>
+/// <param name="">parameters</param>
+void PrintMessage(const wchar_t* format, ...) {
+
+	wchar_t message[4096];
+	va_list args;
+	int numCharsWritten;
+	int maxMessage = sizeof(message) - 3;
+
+	// Write formatted output to message string for all arguments
+	va_start(args, format);
+	numCharsWritten = _vsnwprintf_s(message, maxMessage, format, args);
+	va_end(args);
+
+	// Output the message to console
+	OutputDebugString(message);
+}

@@ -16,6 +16,8 @@ void	CreateMainWindowControls();
 void	HandleDroppedFile(HDROP dropInfo);
 void	HandleMouseWheel(short wheelDelta);
 
+// Debug functions
+void	PrintMessage(const wchar_t* format, ...);
 
 // Control IDs
 #define IDC_ROTATE WM_USER + 1
