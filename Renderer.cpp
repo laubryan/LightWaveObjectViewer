@@ -111,6 +111,22 @@ void Renderer::Render() {
 }
 
 /// <summary>
+/// Reset object transformations
+/// </summary>
+void Renderer::ResetTransformations() {
+
+	// Translate
+	DirectX::XMMATRIX objectTranslation = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	
+	// Rotate
+	DirectX::XMMATRIX objectRotation = DirectX::XMMatrixRotationRollPitchYaw(0, 0, 0);
+	
+	// Update model matrix in vertex shader
+	_modelMatrix = objectTranslation * objectRotation;
+	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.world, _modelMatrix);
+}
+
+/// <summary>
 /// Rotate object
 /// </summary>
 /// <param name="yaw">Yaw rotation amount</param>

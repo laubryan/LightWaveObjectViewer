@@ -174,9 +174,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 					case IDM_ABOUT:
 						DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
 						break;
-					case IDC_ROTATE:
-						_tumbling = !_tumbling;
-						renderer.Tumble(_tumbling);
+					case IDC_RESET_OBJECT:
+						renderer.ResetTransformations();
 						break;
 					case IDM_EXIT:
 						DestroyWindow(hWnd);
@@ -294,7 +293,7 @@ void CreateMainWindowControls() {
 	int topMargin = 10;
 
 	// Create rotate button
-	CreateButton(leftMargin, topMargin, "Rotate/Stop", IDC_ROTATE);
+	CreateButton(leftMargin, topMargin, "Reset Object", IDC_RESET_OBJECT);
 }
 
 /// <summary>

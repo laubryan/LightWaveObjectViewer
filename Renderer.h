@@ -20,6 +20,7 @@ public:
 	bool LoadObject(std::string objectPathname);
 	void Present();
 	void Render();
+	void ResetTransformations();
 	void Rotate(float yaw, float pitch);
 	void Shutdown();
 	void Tumble(bool tumble);

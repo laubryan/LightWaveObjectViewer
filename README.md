@@ -22,6 +22,7 @@ file onto the window to display it.
 
 ## Recent Updates
 
+- Added object rotation by dragging the 3D view using the mouse.
 - Added support for polygons with greater than 4 sides.
 - Added support for changing the view distance using the mouse wheel.
 - The camera view is now initially positioned a suitable distance away when an object is loaded.

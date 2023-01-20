@@ -34,4 +34,4 @@ POINT _dragOrigin;
 Renderer renderer;
 
 // Control IDs
-#define IDC_ROTATE WM_USER + 1
+#define IDC_RESET_OBJECT WM_USER + 1
