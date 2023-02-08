@@ -69,7 +69,6 @@ work will be on the file parsing side rather than D3D.
 
 Some improvements I'd like to make next, in rough priority order:
 
-- Add more view interactions such as rotation.
 - Handle more LightWave surface attributes (e.g. color, reflectivity, etc) and improve the shader.
 - Additional UI to tweak the display.
 - Support LWO3 and test on a wider range of objects.
