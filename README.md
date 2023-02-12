@@ -22,6 +22,7 @@ file onto the window to display it.
 
 ## Recent Updates
 
+- Apply vertex color from surface definition
 - Added object rotation by dragging the 3D view using the mouse.
 - Added support for polygons with greater than 4 sides.
 - Added support for changing the view distance using the mouse wheel.
@@ -69,6 +70,6 @@ work will be on the file parsing side rather than D3D.
 
 Some improvements I'd like to make next, in rough priority order:
 
-- Handle more LightWave surface attributes (e.g. color, reflectivity, etc) and improve the shader.
+- Handle more LightWave surface attributes (e.g. reflectivity, etc) and improve the shader.
 - Additional UI to tweak the display.
 - Support LWO3 and test on a wider range of objects.
