@@ -184,6 +184,22 @@ const vector<POLYGON>& LightWaveObject::GetPolsByLayer(int layerIndex) {
 }
 
 /// <summary>
+/// Get LightWave surface description for this layer
+/// </summary>
+/// <param name="layerIndex">Layer index</param>
+/// <returns>Surface object for this layer</returns>
+Surface* LightWaveObject::GetSurfaceByLayer(int layerIndex) {
+
+	// Get reference to target layer
+	Layer& layer = *_layers[layerIndex].get();
+
+	// Get SURF chunk
+	Surface* surf = (Surface*)layer.getChunk(ChunkTag::SURF);
+
+	return surf;
+}
+
+/// <summary>
 /// Read an LightWave object file
 /// </summary>
 /// <param name="lwObjectFilename">Object filename to read</param>

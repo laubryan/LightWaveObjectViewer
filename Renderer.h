@@ -17,6 +17,7 @@ public:
 	// Structures
 	struct ObjectInfo {
 		int numLayers = 0;
+		int numNonTriangles = 0;
 		int numTriangles = 0;
 		int numVertices = 0;
 	};
@@ -92,8 +93,9 @@ private:
 	// Mesh
 	std::vector<VERTEX> _vertices;
 	std::vector<WORD> _indices;
-	int _numLayers;
-	int _numTriangles;
+
+	// Object info
+	ObjectInfo _objectInfo;
 
 	// Transformations
 	DirectX::XMMATRIX _modelMatrix;

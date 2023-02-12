@@ -59,6 +59,14 @@ int ObjectReader::GetNumLayers() {
 }
 
 /// <summary>
+/// Get number of non triangles retrieved
+/// </summary>
+/// <returns>Number of non triangles</returns>
+int ObjectReader::GetNumNonTriangles() {
+	return _numNonTriangles;
+}
+
+/// <summary>
 /// Get number of triangles retrieved
 /// </summary>
 /// <returns>Number of triangles</returns>
@@ -81,17 +89,28 @@ std::vector<VERTEX> ObjectReader::GetVertices() {
 /// <returns>Transfer success</returns>
 bool ObjectReader::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, string& errorReason) {
 
-	// Count polygons with unsupported number of vertices
-	unsigned unsupportedPolygons = 0;
+	// Record some data on the loaded object
+	_numTriangles = 0;					// Number of triangles extracted
+	_numNonTriangles = 0;				// Polygons with unsupported number of vertices
+	_numLayers = obj->GetNumLayers();	// Number of LightWave object layers
 
 	// Validate object layers
-	size_t numLayers = obj->GetNumLayers();
-	if (numLayers == 0) return false;
-	_numLayers = numLayers;
+	if (_numLayers == 0) return false;
 
-	// Initialize default vertex color
-	// TODO: Integrate color from SURF chunk
-	DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	// Get surface for this layer
+	Surface::COLOR col;
+	Surface* surface = obj->GetSurfaceByLayer(0);
+	if (surface) {
+		// If a surface exists, then extract its color
+		col = surface->getColor();
+	}
+	else {
+		// Otherwise assign the default color
+		col = Surface::COLOR { 1.0f, 1.0f, 1.0f };
+	}
+
+	// Initialize vertex color
+	DirectX::XMFLOAT4 color = DirectX::XMFLOAT4(col.r, col.g, col.b, 1.0f);
 
 	// Transfer LightWave vertices to temporary list
 	vector<VERTEX> lwVertices;
@@ -100,9 +119,6 @@ bool ObjectReader::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, stri
 		VERTEX vertex = { DirectX::XMFLOAT3(point.X, point.Y, point.Z) };
 		lwVertices.push_back(vertex);
 	}
-
-	// Count number of triangles
-	_numTriangles = 0;
 
 	// Transfer polygon indices
 	const vector<POLYGON>& pols = obj->GetPolsByLayer(0);
@@ -190,13 +206,13 @@ bool ObjectReader::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, stri
 		}
 		else {
 			// There were polygons with invalid numbers of vertices
-			unsupportedPolygons++;
+			_numNonTriangles++;
 		}
 	}
 
 	// Display warning about unsupported polygons
-	if (unsupportedPolygons > 0) {
-		errorReason = std::to_string(unsupportedPolygons) + " polygons had an unsupported number of vertices and were skipped.";
+	if (_numNonTriangles > 0) {
+		errorReason = std::to_string(_numNonTriangles) + " polygons had an unsupported number of vertices and were skipped.";
 	}
 
 	return true;

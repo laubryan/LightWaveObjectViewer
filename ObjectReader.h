@@ -5,6 +5,7 @@
 #include <windows.h>
 
 #include "LightWaveObject/LightWaveObject.h"
+#include "LightWaveObject/Chunks/Surface.h"
 #include "RendererDefinitions.h"
 
 class ObjectReader {
@@ -14,6 +15,7 @@ public:
 	std::vector<WORD>	GetIndices();
 	std::vector<VERTEX> GetVertices();
 	int GetNumLayers();
+	int GetNumNonTriangles();
 	int	GetNumTriangles();
 
 	// Public methods
@@ -32,5 +34,6 @@ private:
 	std::vector<WORD> _indices;
 	int _numLayers;
 	int _numTriangles;
+	int _numNonTriangles;
 };
 

@@ -1,10 +1,22 @@
 #include "Surface.h"
 
 /// <summary>
-/// Get surface color
+/// Get surface color as COLOR
 /// </summary>
 /// <returns>Color data</returns>
-COL12 Surface::getColor() {
+Surface::COLOR Surface::getColor() {
+	COLOR col;
+	col.r = _color.r;
+	col.g = _color.g;
+	col.b = _color.b;
+	return col;
+}
+
+/// <summary>
+/// Get surface color as COL12
+/// </summary>
+/// <returns>Color data</returns>
+COL12 Surface::getCol12Color() {
 	return _color;
 }
 

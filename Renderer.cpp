@@ -21,11 +21,7 @@ void Renderer::AdjustViewDistance(int direction) {
 /// </summary>
 /// <returns></returns>
 Renderer::ObjectInfo Renderer::GetObjectInfo() {
-	ObjectInfo info;
-	info.numLayers = _numLayers;
-	info.numTriangles = _numTriangles;
-	info.numVertices = _vertices.size();
-	return info;
+	return _objectInfo;
 }
 
 /// <summary>
@@ -71,8 +67,12 @@ bool Renderer::LoadObject(std::string objectPathname) {
 	// Get object vertices and indices
 	_vertices = reader.GetVertices();
 	_indices = reader.GetIndices();
-	_numTriangles = reader.GetNumTriangles();
-	_numLayers = reader.GetNumLayers();
+
+	// Set object info
+	_objectInfo.numVertices = _vertices.size();
+	_objectInfo.numLayers = reader.GetNumLayers();
+	_objectInfo.numNonTriangles = reader.GetNumNonTriangles();
+	_objectInfo.numTriangles = reader.GetNumTriangles();
 
 	// Buffers
 	if (!InitializeBuffers()) return false;

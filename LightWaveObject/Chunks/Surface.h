@@ -6,11 +6,21 @@
 class Surface : public Chunk {
 public:
 
+	// Structures
+	struct COLOR {
+		float r;
+		float g;
+		float b;
+	};
+
 	// Constructor
 	Surface() : Chunk(ChunkTag::SURF) { }
 
+	// Getters
+	COLOR getColor();
+	COL12 getCol12Color();
+
 	// Public methods
-	COL12 getColor();
 	void parse(char rawBuffer[], LWO_CHUNK_HEADER header) override;
 
 private:

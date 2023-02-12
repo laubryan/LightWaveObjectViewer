@@ -10,7 +10,8 @@
 #include "Chunks/Chunk.h"
 #include "Chunks/Layer.h"
 #include "Chunks/Points.h"
-#include "Chunks//Polygons.h"
+#include "Chunks/Polygons.h"
+#include "Chunks/Surface.h"
 
 class LightWaveObject {
 
@@ -24,6 +25,7 @@ public:
 	size_t GetNumLayers();
 	const vector<VEC12>& GetPointsByLayer(int layerIndex);
 	const vector<POLYGON>& GetPolsByLayer(int layerIndex);
+	Surface* GetSurfaceByLayer(int layerIndex);
 
 private:
 	// Private methods
