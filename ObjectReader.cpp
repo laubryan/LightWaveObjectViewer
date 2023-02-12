@@ -51,6 +51,22 @@ std::vector<WORD> ObjectReader::GetIndices() {
 }
 
 /// <summary>
+/// Get number of layers
+/// </summary>
+/// <returns>Number of layers</returns>
+int ObjectReader::GetNumLayers() {
+	return _numLayers;
+}
+
+/// <summary>
+/// Get number of triangles retrieved
+/// </summary>
+/// <returns>Number of triangles</returns>
+int ObjectReader::GetNumTriangles() {
+	return _numTriangles;
+}
+
+/// <summary>
 /// Get a copy of the object's vertices
 /// </summary>
 /// <returns>Vector of object vertices</returns>
@@ -71,6 +87,7 @@ bool ObjectReader::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, stri
 	// Validate object layers
 	size_t numLayers = obj->GetNumLayers();
 	if (numLayers == 0) return false;
+	_numLayers = numLayers;
 
 	// Initialize default vertex color
 	// TODO: Integrate color from SURF chunk
@@ -83,6 +100,9 @@ bool ObjectReader::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, stri
 		VERTEX vertex = { DirectX::XMFLOAT3(point.X, point.Y, point.Z) };
 		lwVertices.push_back(vertex);
 	}
+
+	// Count number of triangles
+	_numTriangles = 0;
 
 	// Transfer polygon indices
 	const vector<POLYGON>& pols = obj->GetPolsByLayer(0);
@@ -139,6 +159,7 @@ bool ObjectReader::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, stri
 			unsigned endTargetIndex = targetIndexOffset + 0;
 			unsigned midTargetIndex = targetIndexOffset + 2;
 			targetIndexOffset += 3;
+			_numTriangles++;
 
 			// Select successive opposite vectors to form each triangle
 			for (unsigned vertexIndex = 3; vertexIndex < (unsigned)pol.numVertices; vertexIndex++) {
@@ -164,6 +185,7 @@ bool ObjectReader::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, stri
 				// Set up for next triangle
 				midTargetIndex = targetIndexOffset; // Next mid vertex is this triangle's first vertex
 				targetIndexOffset++;
+				_numTriangles++;
 			}
 		}
 		else {

@@ -15,14 +15,25 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 // Initialization functions
 void	CreateMainWindowControls();
 
+
 // Event handlers
 void	HandleDroppedFile(HDROP dropInfo);
 void	HandleMouseDragging(HWND hwnd, long x, long y);
 void	HandleMouseWheel(short wheelDelta);
 
+// Field functions
+HWND	CreateField(HWND parent, int x, int y, LPCWSTR labelText);
+void	SetFieldValue(HWND field, int value);
+
 // Debug functions
 void	PrintMessage(const wchar_t* format, ...);
 
+// Object Information
+HWND _infoBox;
+HWND _infoVertices;
+HWND _infoTriangles;
+HWND _infoLayers;
+Renderer::ObjectInfo _objectInfo;
 
 // States
 bool _objectLoaded = false;

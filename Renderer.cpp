@@ -17,6 +17,18 @@ void Renderer::AdjustViewDistance(int direction) {
 }
 
 /// <summary>
+/// Get object info
+/// </summary>
+/// <returns></returns>
+Renderer::ObjectInfo Renderer::GetObjectInfo() {
+	ObjectInfo info;
+	info.numLayers = _numLayers;
+	info.numTriangles = _numTriangles;
+	info.numVertices = _vertices.size();
+	return info;
+}
+
+/// <summary>
 /// Initialize renderer
 /// </summary>
 bool Renderer::Initialize(HWND outputWindow, UINT width, UINT height) {
@@ -59,6 +71,8 @@ bool Renderer::LoadObject(std::string objectPathname) {
 	// Get object vertices and indices
 	_vertices = reader.GetVertices();
 	_indices = reader.GetIndices();
+	_numTriangles = reader.GetNumTriangles();
+	_numLayers = reader.GetNumLayers();
 
 	// Buffers
 	if (!InitializeBuffers()) return false;
@@ -192,21 +206,6 @@ void Renderer::Update() {
 
 	// Calculate elapsed time
 	float elapsedTime = (float)(currentTime - _time);
-
-	// Calculate object rotation
-	//if (_tumble) {
-
-	//	// Translate
-	//	DirectX::XMMATRIX objectTranslation = DirectX::XMMatrixTranslation(0.0f, 0.0f, 0.0f);
-
-	//	// Rotate
-	//	float rotation = elapsedTime / 2000.0f;
-	//	DirectX::XMMATRIX objectRotation = DirectX::XMMatrixRotationRollPitchYaw(rotation, rotation, 0);
-
-	//	// Update model matrix in vertex shader
-	//	_modelMatrix = objectTranslation * objectRotation;
-	//	DirectX::XMStoreFloat4x4(&_vsConstantBufferData.world, _modelMatrix);
-	//}
 
 	// Calculate view matrix
 	DirectX::XMVECTOR eyePt = DirectX::XMVectorSet(0.0f, 0.0f, _viewZ, 0.0f);

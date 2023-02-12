@@ -14,6 +14,16 @@
 class Renderer {
 public:
 
+	// Structures
+	struct ObjectInfo {
+		int numLayers = 0;
+		int numTriangles = 0;
+		int numVertices = 0;
+	};
+
+	// Getters
+	ObjectInfo	GetObjectInfo();
+
 	// Public methods
 	void AdjustViewDistance(int direction);
 	bool Initialize(HWND outputWindow, UINT width, UINT height);
@@ -82,6 +92,8 @@ private:
 	// Mesh
 	std::vector<VERTEX> _vertices;
 	std::vector<WORD> _indices;
+	int _numLayers;
+	int _numTriangles;
 
 	// Transformations
 	DirectX::XMMATRIX _modelMatrix;

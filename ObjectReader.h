@@ -10,10 +10,14 @@
 class ObjectReader {
 public:
 
+	// Getters
+	std::vector<WORD>	GetIndices();
+	std::vector<VERTEX> GetVertices();
+	int GetNumLayers();
+	int	GetNumTriangles();
+
 	// Public methods
 	bool ReadObjectFile(std::string objectPathname, std::string& errorReason);
-	std::vector<WORD> GetIndices();
-	std::vector<VERTEX> GetVertices();
 
 private:
 
@@ -26,5 +30,7 @@ private:
 	// Mesh
 	std::vector<VERTEX> _vertices;
 	std::vector<WORD> _indices;
+	int _numLayers;
+	int _numTriangles;
 };
 

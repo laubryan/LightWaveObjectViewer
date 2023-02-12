@@ -10,9 +10,9 @@
 HINSTANCE hInst;                        // current instance
 WCHAR szTitle[MAX_LOADSTRING];          // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];    // the main window class name
-HWND mainWindow;						// Main window handle
-HWND renderWindow;						// Render output window handle
-RECT renderWindowRect;					// Render output window client rect
+HWND _mainWindow;						// Main window handle
+HWND _renderWindow;						// Render output window handle
+RECT _renderWindowRect;					// Render output window client rect
 
 // Definitions
 UINT WINDOW_WIDTH = 1300;
@@ -40,7 +40,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LWOBJECTVIEWER));
 
 	// Initialize renderer
-	if (!renderer.Initialize(renderWindow, RENDER_WINDOW_WIDTH, RENDER_WINDOW_HEIGHT)) return 0;
+	if (!renderer.Initialize(_renderWindow, RENDER_WINDOW_WIDTH, RENDER_WINDOW_HEIGHT)) return 0;
 
 	// Peek at initial message in queue
 	MSG msg;
@@ -81,8 +81,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	return (int)msg.wParam;
 }
 
-
-
 //
 //  FUNCTION: MyRegisterClass()
 //
@@ -100,7 +98,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 	wcex.hInstance = hInstance;
 	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_LWOBJECTVIEWER));
 	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(LTGRAY_BRUSH);
+	wcex.hbrBackground = (HBRUSH)NULL;
 	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_LWOBJECTVIEWER);
 	wcex.lpszClassName = szWindowClass;
 	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -121,7 +119,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 	hInst = hInstance; // Store instance handle in our global variable
 
-	mainWindow = CreateWindowW(
+	_mainWindow = CreateWindowW(
 		szWindowClass,
 		szTitle,
 		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
@@ -134,21 +132,21 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 		hInstance,
 		nullptr);
 
-	if (!mainWindow) {
+	if (!_mainWindow) {
 		return FALSE;
 	}
 
-	ShowWindow(mainWindow, nCmdShow);
-	UpdateWindow(mainWindow);
+	ShowWindow(_mainWindow, nCmdShow);
+	UpdateWindow(_mainWindow);
 
 	// Register window as drop target
-	DragAcceptFiles(mainWindow, TRUE);
+	DragAcceptFiles(_mainWindow, TRUE);
 
 	// Populate main window controls
 	CreateMainWindowControls();
 
 	// Get render window rect
-	GetClientRect(renderWindow, &renderWindowRect);
+	GetClientRect(_renderWindow, &_renderWindowRect);
 
 	return TRUE;
 }
@@ -251,7 +249,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
 /// <param name="y">Y coordinate</param>
 /// <param name="text">Button text</param>
 /// <param name="id">Button ID</param>
-HWND CreateButton(int x, int y, std::string text, UINT id) {
+HWND CreateButton(int x, int y, int width, int height, std::string text, UINT id) {
 
 	// Convert button text
 	std::wstring buttonText = std::wstring(text.begin(), text.end());
@@ -262,12 +260,24 @@ HWND CreateButton(int x, int y, std::string text, UINT id) {
 		buttonText.c_str(),
 		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
 		x, y, 
-		150, 30,
-		mainWindow,
+		width, height,
+		_mainWindow,
 		(HMENU)id,
-		(HINSTANCE)GetWindowLongPtr(mainWindow, GWLP_HINSTANCE),
+		(HINSTANCE)GetWindowLongPtr(_mainWindow, GWLP_HINSTANCE),
 		NULL
 	);
+}
+
+/// <summary>
+/// Create static field
+/// </summary>
+/// <param name="labelText">Label text</param>
+HWND CreateField(HWND parent, int x, int y, LPCWSTR labelText) {
+
+	SIZE textDimensions;
+	GetTextExtentPoint32(GetDC(parent), labelText, lstrlen(labelText), &textDimensions);
+
+	return CreateWindow(L"STATIC", labelText, WS_VISIBLE | WS_CHILD, x, y, textDimensions.cx, textDimensions.cy, parent, NULL, (HINSTANCE)GetWindowLongPtr(_mainWindow, GWLP_HINSTANCE), NULL);
 }
 
 /// <summary>
@@ -276,24 +286,46 @@ HWND CreateButton(int x, int y, std::string text, UINT id) {
 void CreateMainWindowControls() {
 
 	// Create child render frame
-	renderWindow = CreateWindowW(
+	_renderWindow = CreateWindowW(
 		L"Static",
 		NULL,
 		WS_VISIBLE | WS_CHILD,
 		10, 10, 
 		RENDER_WINDOW_WIDTH, RENDER_WINDOW_HEIGHT,
-		mainWindow,
+		_mainWindow,
 		NULL,
-		(HINSTANCE)GetWindowLongPtr(mainWindow, GWLP_HINSTANCE),
+		(HINSTANCE)GetWindowLongPtr(_mainWindow, GWLP_HINSTANCE),
 		NULL
 	);
 
 	// Define margins
 	int leftMargin = 1050;
+	int contentWidth = 220;
 	int topMargin = 10;
 
-	// Create rotate button
-	CreateButton(leftMargin, topMargin, "Reset Object", IDC_RESET_OBJECT);
+	int boxLeftMargin = 15;
+	int boxTopMargin = 25;
+
+	// Create Object Information Box
+	_infoBox = CreateWindow(L"BUTTON", L"", WS_VISIBLE | WS_CHILD | BS_GROUPBOX, leftMargin, topMargin, contentWidth, 200, _mainWindow, NULL, (HINSTANCE)GetWindowLongPtr(_mainWindow, GWLP_HINSTANCE), NULL);
+
+	// Vertices
+	int topOffset = 0;
+	HWND labelVertices = CreateField(_infoBox, boxLeftMargin, boxTopMargin + topOffset, L"Vertices:");
+	_infoVertices = CreateField(_infoBox, boxLeftMargin + 100, boxTopMargin + topOffset, L"0");
+
+	// Triangles
+	topOffset += 25;
+	HWND labelTriangles = CreateField(_infoBox, boxLeftMargin, boxTopMargin + topOffset, L"Triangles:");
+	_infoTriangles = CreateField(_infoBox, boxLeftMargin + 100, boxTopMargin + topOffset, L"0");
+
+	// Layers
+	topOffset += 25;
+	HWND labelLayers = CreateField(_infoBox, boxLeftMargin, boxTopMargin + topOffset, L"Layers:");
+	_infoLayers = CreateField(_infoBox, boxLeftMargin + 100, boxTopMargin + topOffset, L"0");
+
+	// Create reset button
+	CreateButton(leftMargin, topMargin + 220, contentWidth, 40, "Reset Object", IDC_RESET_OBJECT);
 }
 
 /// <summary>
@@ -324,6 +356,12 @@ void HandleDroppedFile(HDROP dropInfo) {
 
 				// Object loaded
 				_objectLoaded = true;
+
+				// Set object info
+				_objectInfo = renderer.GetObjectInfo();
+				SetFieldValue(_infoVertices, _objectInfo.numVertices);
+				SetFieldValue(_infoTriangles, _objectInfo.numTriangles);
+				SetFieldValue(_infoLayers, _objectInfo.numLayers);
 			}
 		}
 	}
@@ -343,7 +381,7 @@ void HandleMouseDragging(HWND hwnd, long x, long y) {
 	POINT dragPoint = POINT({ x, y });
 
 	// Only accept dragging within render window
-	if (!PtInRect(&renderWindowRect, dragPoint)) return;
+	if (!PtInRect(&_renderWindowRect, dragPoint)) return;
 
 	// Save drag origin point if dragging has just started
 	if (!_isDragging) {
@@ -397,4 +435,23 @@ void PrintMessage(const wchar_t* format, ...) {
 
 	// Output the message to console
 	OutputDebugString(message);
+}
+
+/// <summary>
+/// Set value in field
+/// </summary>
+/// <param name="field">Window hanlde of field</param>
+/// <param name="value">Numeric value</param>
+void SetFieldValue(HWND field, int numericValue) {
+
+	// Convert value to string
+	std::wstring valueText = std::to_wstring(numericValue);
+
+	// Set the field value
+	SetWindowText(field, valueText.c_str());
+
+	// Resize field
+	SIZE textDimensions;
+	GetTextExtentPoint32(GetDC(_infoBox), valueText.c_str(), valueText.size(), &textDimensions);
+	SetWindowPos(field, NULL, 0, 0, textDimensions.cx, textDimensions.cy, SWP_NOMOVE);
 }
