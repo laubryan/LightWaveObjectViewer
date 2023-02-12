@@ -311,18 +311,24 @@ void CreateMainWindowControls() {
 
 	// Vertices
 	int topOffset = 0;
-	HWND labelVertices = CreateField(_infoBox, boxLeftMargin, boxTopMargin + topOffset, L"Vertices:");
-	_infoVertices = CreateField(_infoBox, boxLeftMargin + 100, boxTopMargin + topOffset, L"0");
+	int fieldOffset = 110;
+	CreateField(_infoBox, boxLeftMargin, boxTopMargin + topOffset, L"Vertices:");
+	_infoVertices = CreateField(_infoBox, boxLeftMargin + fieldOffset, boxTopMargin + topOffset, L"0");
 
 	// Triangles
 	topOffset += 25;
-	HWND labelTriangles = CreateField(_infoBox, boxLeftMargin, boxTopMargin + topOffset, L"Triangles:");
-	_infoTriangles = CreateField(_infoBox, boxLeftMargin + 100, boxTopMargin + topOffset, L"0");
+	CreateField(_infoBox, boxLeftMargin, boxTopMargin + topOffset, L"Triangles:");
+	_infoTriangles = CreateField(_infoBox, boxLeftMargin + fieldOffset, boxTopMargin + topOffset, L"0");
+
+	// Non-Triangles
+	topOffset += 25;
+	CreateField(_infoBox, boxLeftMargin, boxTopMargin + topOffset, L"Non-Triangles:");
+	_infoNonTriangles = CreateField(_infoBox, boxLeftMargin + fieldOffset, boxTopMargin + topOffset, L"0");
 
 	// Layers
 	topOffset += 25;
-	HWND labelLayers = CreateField(_infoBox, boxLeftMargin, boxTopMargin + topOffset, L"Layers:");
-	_infoLayers = CreateField(_infoBox, boxLeftMargin + 100, boxTopMargin + topOffset, L"0");
+	CreateField(_infoBox, boxLeftMargin, boxTopMargin + topOffset, L"Layers:");
+	_infoLayers = CreateField(_infoBox, boxLeftMargin + fieldOffset, boxTopMargin + topOffset, L"0");
 
 	// Create reset button
 	CreateButton(leftMargin, topMargin + 220, contentWidth, 40, "Reset Object", IDC_RESET_OBJECT);
@@ -361,6 +367,7 @@ void HandleDroppedFile(HDROP dropInfo) {
 				_objectInfo = renderer.GetObjectInfo();
 				SetFieldValue(_infoVertices, _objectInfo.numVertices);
 				SetFieldValue(_infoTriangles, _objectInfo.numTriangles);
+				SetFieldValue(_infoNonTriangles, _objectInfo.numNonTriangles);
 				SetFieldValue(_infoLayers, _objectInfo.numLayers);
 			}
 		}

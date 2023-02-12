@@ -30,9 +30,10 @@ void	PrintMessage(const wchar_t* format, ...);
 
 // Object Information
 HWND _infoBox;
-HWND _infoVertices;
-HWND _infoTriangles;
 HWND _infoLayers;
+HWND _infoNonTriangles;
+HWND _infoTriangles;
+HWND _infoVertices;
 Renderer::ObjectInfo _objectInfo;
 
 // States
