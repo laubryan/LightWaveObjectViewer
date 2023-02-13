@@ -22,6 +22,7 @@ file onto the window to display it.
 
 ## Recent Updates
 
+- Add prelminary support for LWO3 object format
 - Apply vertex color from surface definition
 - Added object rotation by dragging the 3D view using the mouse.
 - Added support for polygons with greater than 4 sides.
@@ -72,4 +73,4 @@ Some improvements I'd like to make next, in rough priority order:
 
 - Handle more LightWave surface attributes (e.g. reflectivity, etc) and improve the shader.
 - Additional UI to tweak the display.
-- Support LWO3 and test on a wider range of objects.
+- Test on a wider range of objects.
