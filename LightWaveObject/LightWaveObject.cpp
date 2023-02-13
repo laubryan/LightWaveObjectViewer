@@ -37,8 +37,8 @@ bool LightWaveObject::Read(string lwObjectFilename, wstring& errorReason) {
 	}
 
 	// Not a supported format
-	if (fileHeader.id != "LWO2") {
-		errorReason = "LightWave object version is not supported: " + fileHeader.id;
+	if (!(fileHeader.id == "LWO2" || fileHeader.id == "LWO3")) {
+		errorReason = L"LightWave object format is not supported";
 		return false;
 	}
 
