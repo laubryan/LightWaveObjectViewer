@@ -18,7 +18,7 @@ class LightWaveObject {
 public:
 
 	// Public methods
-	bool Read(std::string lwObjectFilename, string& errorReason);
+	bool Read(std::string lwObjectFilename, wstring& errorReason);
 	void displayStatistics();
 
 	// Getters

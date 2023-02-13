@@ -358,7 +358,8 @@ void HandleDroppedFile(HDROP dropInfo) {
 		
 			// Load the object file
 			string objectPathname = string((char*)mbFilename, numChars);
-			if (renderer.LoadObject(objectPathname)) {
+			wstring errorReason;
+			if (renderer.LoadObject(objectPathname, errorReason)) {
 
 				// Object loaded
 				_objectLoaded = true;
@@ -369,6 +370,11 @@ void HandleDroppedFile(HDROP dropInfo) {
 				SetFieldValue(_infoTriangles, _objectInfo.numTriangles);
 				SetFieldValue(_infoNonTriangles, _objectInfo.numNonTriangles);
 				SetFieldValue(_infoLayers, _objectInfo.numLayers);
+			}
+			else {
+
+				// Error loeading the object
+				MessageBox(_mainWindow, errorReason.c_str(), L"Couldn't Load the Object", MB_ICONERROR | MB_OK);
 			}
 		}
 	}

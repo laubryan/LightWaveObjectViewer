@@ -7,7 +7,7 @@
 /// <param name="objectPathname">Full path and filename for the object file</param>
 /// <param name="errorReason">Reason for the failure</param>
 /// <returns>Read success</returns>
-bool ObjectReader::ReadObjectFile(string objectPathname, string& errorReason) {
+bool ObjectReader::ReadObjectFile(string objectPathname, wstring& errorReason) {
 
 	// Initialize state
 	_objectLoaded = false;
@@ -16,22 +16,27 @@ bool ObjectReader::ReadObjectFile(string objectPathname, string& errorReason) {
 
 	// Verify that the file exists
 	if (!std::filesystem::exists(objectPathname)) {
-		errorReason = "The file does not exist";
+		errorReason = L"The file does not exist";
 		return false;
 	}
 
 	// Read designated object file
 	std::unique_ptr<LightWaveObject> lwObject = make_unique<LightWaveObject>();
 	if (!lwObject->Read(objectPathname, errorReason)) {
-		errorReason = "The file could not be read";
+
+		// Assign generic error if none returned
+		if (errorReason == L"") {
+			errorReason = L"The file could not be read";
+		}
+
 		return false;
 	}
 
 	// Transfer mesh data
-	errorReason = "";
+	errorReason = L"";
 	if (!TransferMeshDataFromLWO(move(lwObject), errorReason)) {
-		if (errorReason == "") {
-			errorReason = "Could not transfer mesh data from object file";
+		if (errorReason == L"") {
+			errorReason = L"Could not transfer mesh data from object file";
 		}
 		return false;
 	}
@@ -87,7 +92,7 @@ std::vector<VERTEX> ObjectReader::GetVertices() {
 /// </summary>
 /// <param name="obj">LightWave object</param>
 /// <returns>Transfer success</returns>
-bool ObjectReader::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, string& errorReason) {
+bool ObjectReader::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, wstring& errorReason) {
 
 	// Record some data on the loaded object
 	_numTriangles = 0;					// Number of triangles extracted
@@ -212,7 +217,7 @@ bool ObjectReader::TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, stri
 
 	// Display warning about unsupported polygons
 	if (_numNonTriangles > 0) {
-		errorReason = std::to_string(_numNonTriangles) + " polygons had an unsupported number of vertices and were skipped.";
+		errorReason = L"Some polygons had an unsupported number of vertices and were skipped.";
 	}
 
 	return true;

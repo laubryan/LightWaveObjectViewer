@@ -14,7 +14,7 @@
 /// </summary>
 /// <param name="lwObjectFilename">Object filename to read</param>
 /// <returns>Read success</returns>
-bool LightWaveObject::Read(string lwObjectFilename, string& errorReason) {
+bool LightWaveObject::Read(string lwObjectFilename, wstring& errorReason) {
 
 	unique_ptr<char[]> fileBuffer;	// Memory buffer
 
@@ -23,7 +23,7 @@ bool LightWaveObject::Read(string lwObjectFilename, string& errorReason) {
 	if (fileBuffer == nullptr) {
 
 		// Couldn't read the file
-		errorReason = "Couldn't read the file";
+		errorReason = L"Couldn't read the file";
 		return false;
 	}
 
@@ -32,7 +32,7 @@ bool LightWaveObject::Read(string lwObjectFilename, string& errorReason) {
 
 	// Not a valid LightWave object
 	if (fileHeader.form != "FORM") {
-		errorReason = "File is not a valid LightWave object file";
+		errorReason = L"File is not a valid LightWave object file";
 		return false;
 	}
 

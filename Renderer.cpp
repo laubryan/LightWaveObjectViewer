@@ -48,13 +48,11 @@ bool Renderer::Initialize(HWND outputWindow, UINT width, UINT height) {
 /// Load object
 /// </summary>
 /// <returns>Load success state</returns>
-bool Renderer::LoadObject(std::string objectPathname) {
+bool Renderer::LoadObject(std::string objectPathname, std::wstring& errorReason) {
 
 	// Extract mesh data from object
 	ObjectReader reader;
-	string errorReason;
 	if (!reader.ReadObjectFile(objectPathname, errorReason)) {
-		MessageBoxA(_outputWindow, errorReason.c_str(), "Error Loading Object", MB_OK);
 		return false;
 	}
 

@@ -19,12 +19,12 @@ public:
 	int	GetNumTriangles();
 
 	// Public methods
-	bool ReadObjectFile(std::string objectPathname, std::string& errorReason);
+	bool ReadObjectFile(std::string objectPathname, std::wstring& errorReason);
 
 private:
 
 	// Private member functions
-	bool TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, std::string& errorReason);
+	bool TransferMeshDataFromLWO(unique_ptr<LightWaveObject> obj, std::wstring& errorReason);
 
 	// Private data
 	bool _objectLoaded {};

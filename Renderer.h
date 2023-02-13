@@ -28,7 +28,7 @@ public:
 	// Public methods
 	void AdjustViewDistance(int direction);
 	bool Initialize(HWND outputWindow, UINT width, UINT height);
-	bool LoadObject(std::string objectPathname);
+	bool LoadObject(std::string objectPathname, std::wstring& errorReason);
 	void Present();
 	void Render();
 	void ResetTransformations();

@@ -40,7 +40,7 @@ struct LWO_FILE_HEADER_RAW {
 // Cooked file header
 struct LWO_FILE_HEADER {
 	string form; // FORM
-	size_t fileLength;
+	size_t fileLength = 0;
 	string id; // ID
 };
 
