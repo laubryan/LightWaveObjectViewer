@@ -35,10 +35,10 @@ VS_OUTPUT main(VS_INPUT i)
     o.col = i.col;
     
     // Transform normal
-    o.worldNormal = normalize(mul(i.normal, world));
+    o.worldNormal = normalize(mul(i.normal, world)).xyz;
     
     // Calculate vertex world position
-    o.worldPosition = mul(i.pos, world);
+    o.worldPosition = mul(i.pos, world).xyz;
     
     // Apply view-projection transformation
     o.pos = mul(i.pos, worldViewProj);
