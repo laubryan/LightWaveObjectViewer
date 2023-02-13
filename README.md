@@ -19,9 +19,15 @@ LightWave Object Viewer is a Windows application using Direct3D 11, created in V
 Compile and run the tool, and then you can simply drag and drop a LightWave object (LWO) 
 file onto the window to display it.
 
+Alternatively, load an object by specifying its full pathname as a parameter on the commandline, e.g.:
+
+	`LightWaveObjectViewer.exe C:\MyObjects\FunkyObject.lwo`
+
+You can also create a file association using this method, so that LightWave objects can be viewed by double clicking them in Windows Explorer.
 
 ## Recent Updates
 
+- Add ability to load objects using command line (for file associations)
 - Add prelminary support for LWO3 object format
 - Apply vertex color from surface definition
 - Added object rotation by dragging the 3D view using the mouse.
