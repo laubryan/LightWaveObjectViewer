@@ -21,7 +21,9 @@ file onto the window to display it.
 
 Alternatively, load an object by specifying its full pathname as a parameter on the commandline, e.g.:
 
-	`LightWaveObjectViewer.exe C:\MyObjects\FunkyObject.lwo`
+```
+LightWaveObjectViewer.exe C:\MyObjects\MyCoolObject.lwo
+```
 
 You can also create a file association using this method, so that LightWave objects can be viewed by double clicking them in Windows Explorer.
 
