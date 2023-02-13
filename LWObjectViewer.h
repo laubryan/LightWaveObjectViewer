@@ -12,18 +12,18 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-// Initialization functions
-void	CreateMainWindowControls();
-
-
 // Event handlers
 void	HandleDroppedFile(HDROP dropInfo);
 void	HandleMouseDragging(HWND hwnd, long x, long y);
 void	HandleMouseWheel(short wheelDelta);
 
 // Field functions
+void	CreateMainWindowControls();
 HWND	CreateField(HWND parent, int x, int y, LPCWSTR labelText);
 void	SetFieldValue(HWND field, int value);
+
+// Methods
+bool	LoadObject(LPWSTR pathname);
 
 // Debug functions
 void	PrintMessage(const wchar_t* format, ...);

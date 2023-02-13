@@ -42,6 +42,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Initialize renderer
 	if (!renderer.Initialize(_renderWindow, RENDER_WINDOW_WIDTH, RENDER_WINDOW_HEIGHT)) return 0;
 
+	// Load object if specified on command line
+	if (lstrcmpi(lpCmdLine, L"") != 0) {
+		if (!LoadObject(lpCmdLine)) {
+
+			// If not loaded correctly from the command line 
+			// then quit immediately
+			PostQuitMessage(0);
+		}
+	}
+
 	// Peek at initial message in queue
 	MSG msg;
 	msg.message = WM_NULL;
@@ -351,31 +361,7 @@ void HandleDroppedFile(HDROP dropInfo) {
 		LPWSTR draggedFilename[MAX_PATH];
 		UINT numChars = DragQueryFile(dropInfo, 0, (LPWSTR)draggedFilename, MAX_PATH);
 		if (numChars != 0) {
-
-			// Convert pathname
-			char mbFilename[MAX_PATH];
-			UINT bytesWritten = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK | WC_DEFAULTCHAR, (LPWSTR)draggedFilename, -1, mbFilename, MAX_PATH, NULL, NULL);
-		
-			// Load the object file
-			string objectPathname = string((char*)mbFilename, numChars);
-			wstring errorReason;
-			if (renderer.LoadObject(objectPathname, errorReason)) {
-
-				// Object loaded
-				_objectLoaded = true;
-
-				// Set object info
-				_objectInfo = renderer.GetObjectInfo();
-				SetFieldValue(_infoVertices, _objectInfo.numVertices);
-				SetFieldValue(_infoTriangles, _objectInfo.numTriangles);
-				SetFieldValue(_infoNonTriangles, _objectInfo.numNonTriangles);
-				SetFieldValue(_infoLayers, _objectInfo.numLayers);
-			}
-			else {
-
-				// Error loeading the object
-				MessageBox(_mainWindow, errorReason.c_str(), L"Couldn't Load the Object", MB_ICONERROR | MB_OK);
-			}
+			LoadObject((LPWSTR)draggedFilename);
 		}
 	}
 }
@@ -427,6 +413,47 @@ void HandleMouseDragging(HWND hwnd, long x, long y) {
 /// <param name="wheelDelta">Scroll direction</param>
 void HandleMouseWheel(short wheelDelta) {
 	renderer.AdjustViewDistance(wheelDelta);
+}
+
+/// <summary>
+/// Load object using filename
+/// </summary>
+/// <param name="pathname">Path and filename of object</param>
+bool LoadObject(LPWSTR pathname) {
+
+	// Convert pathname
+	int numChars = lstrlen(pathname);
+	char mbFilename[MAX_PATH];
+	UINT bytesWritten = WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK | WC_DEFAULTCHAR, (LPWSTR)pathname, -1, mbFilename, MAX_PATH, NULL, NULL);
+	string objectPathname = string((char*)mbFilename, numChars);
+
+	// Strip leading/trailing quotes
+	if (objectPathname.front() == '"' && objectPathname.back() == '"') {
+		objectPathname = objectPathname.substr(1, numChars - 2);
+	}
+
+	// Load the object file
+	wstring errorReason;
+	if (renderer.LoadObject(objectPathname, errorReason)) {
+
+		// Object loaded
+		_objectLoaded = true;
+
+		// Set object info
+		_objectInfo = renderer.GetObjectInfo();
+		SetFieldValue(_infoVertices, _objectInfo.numVertices);
+		SetFieldValue(_infoTriangles, _objectInfo.numTriangles);
+		SetFieldValue(_infoNonTriangles, _objectInfo.numNonTriangles);
+		SetFieldValue(_infoLayers, _objectInfo.numLayers);
+
+		return true;
+	}
+	else {
+
+		// Error loeading the object
+		MessageBox(_mainWindow, errorReason.c_str(), L"Couldn't Load the Object", MB_ICONERROR | MB_OK);
+		return false;
+	}
 }
 
 /// <summary>
